@@ -8,11 +8,11 @@ import { Pill } from "./components/UI/Pill";
 import { 
   uniq, 
   uid, 
-  today, 
-  normalizeCNProvinceName, 
+  today,  
   normalizeUSStateName,
   getFlagEmoji 
 } from "./lib/utils";
+import { CN_EN_TO_ZH } from "./constants/geoMaps";
 import type { TagId, Trip, Candidate } from "./types";
 
 type ViewMode = "world" | "cn" | "us";
@@ -237,7 +237,7 @@ export default function App() {
     // 因为 setView 会触发 useEffect 去设置 maxBounds 和 easeTo (飞到国家中心)
     // 我们需要等 view 切换完，再精细飞行到城市
     setTimeout(() => {
-      flyToLonLat(it.lon, it.lat, 6);
+      flyToLonLat(it.lon, it.lat, 4);
     }, 800); // 稍微延迟一点，让视图切换动画先走
 
     setQ("");
@@ -282,9 +282,17 @@ export default function App() {
         current
           .filter((t) => (t.place.countryIso2 || "").toUpperCase() === "CN" && t.place.admin1)
           .flatMap((t) => {
-            const raw = (t.place.admin1 || "").trim();
-            const mapped = normalizeCNProvinceName(raw);
-            return [raw, mapped].filter(Boolean);
+            const raw = (t.place.admin1 || "").trim(); // 例如 "Zhejiang Province"
+            
+            // 1. 清洗英文后缀 (得到 "Zhejiang")
+            const clean = raw.replace(/( Province| City| Autonomous Region| AR| SAR)/gi, "").trim();
+            
+            // 2. 尝试映射为中文全称 (得到 "浙江省")
+            // 这样 "Zhejiang" 就能匹配阿里云地图里的 "浙江省" 了
+            const zhName = CN_EN_TO_ZH[clean];
+
+            // 把 原始英文、清洗后英文、中文名 全部扔进去尝试匹配
+            return [raw, clean, zhName].filter(Boolean);
           })
       );
       const filter: any = ["in", ["get", "name"], ["literal", cnKeys.length ? cnKeys : [""]]];
@@ -353,9 +361,9 @@ export default function App() {
       map.easeTo({ center: [0, 20], zoom: 1.5 });
     } else if (view === "cn") {
       setVisible("cn");
-      map.setMaxBounds([[60, 0], [150, 60]]);
-      map.setMinZoom(2); map.setMaxZoom(7);
-      map.easeTo({ center: [104, 35], zoom: 3.2 });
+      map.setMaxBounds([[60, -10], [160, 60]]);
+      map.setMinZoom(2); map.setMaxZoom(6);
+      map.easeTo({ center: [104, 28], zoom: 1.0 });
     } else if (view === "us") {
       setVisible("us");
       map.setMaxBounds([[-180, 10], [-50, 75]]);

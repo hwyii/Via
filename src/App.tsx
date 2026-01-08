@@ -292,13 +292,27 @@ export default function App() {
 
     importData(file)
       .then((newTrips) => {
+        // 1. 更新足迹数据
         setTrips(newTrips);
         saveTrips(newTrips);
+
+        // 👇👇👇 🟢 新增：自动发现并注册新 Tag 👇👇👇
+        // 从导入的数据里提取所有 tag 名字
+        const importedTags = newTrips.map(t => t.tag);
+        // 合并现有 tags 和 导入的 tags，并去重 (Set)
+        const mergedTags = Array.from(new Set([...tags, ...importedTags]));
+        
+        // 如果发现了新 Tag，就保存
+        if (mergedTags.length > tags.length) {
+           setTagsState(mergedTags);
+           saveTags(mergedTags);
+        }
+        // 👆👆👆 新增结束 👆👆👆
+
         alert(`Success! Loaded ${newTrips.length} footprints.`);
       })
       .catch((err) => alert("Failed to import: " + err));
     
-    // 清空 input 防止重复上传同一个文件没反应
     e.target.value = ""; 
   }
 

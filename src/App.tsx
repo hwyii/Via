@@ -439,6 +439,12 @@ export default function App() {
     } else if (view === "us") {
       dotFilter = ["==", ["get", "countryIso2"], "US"];
     }
+    if (map.getLayer("dots-glow")) {
+      map.setFilter("dots-glow", dotFilter);
+    }
+    if (map.getLayer("dots-inner")) {
+      map.setFilter("dots-inner", dotFilter);
+    }
   }, [view, mapReady]);
 
   return (

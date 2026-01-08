@@ -296,7 +296,6 @@ export default function App() {
         setTrips(newTrips);
         saveTrips(newTrips);
 
-        // 👇👇👇 🟢 新增：自动发现并注册新 Tag 👇👇👇
         // 从导入的数据里提取所有 tag 名字
         const importedTags = newTrips.map(t => t.tag);
         // 合并现有 tags 和 导入的 tags，并去重 (Set)
@@ -432,6 +431,13 @@ export default function App() {
       map.setMaxBounds([[-180, 10], [-50, 75]]);
       map.setMinZoom(2); map.setMaxZoom(7);
       map.easeTo({ center: [-98, 38], zoom: 3.0 });
+    }
+    let dotFilter: any = null;
+
+    if (view === "cn") {
+      dotFilter = ["==", ["get", "countryIso2"], "CN"];
+    } else if (view === "us") {
+      dotFilter = ["==", ["get", "countryIso2"], "US"];
     }
   }, [view, mapReady]);
 

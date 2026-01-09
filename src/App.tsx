@@ -336,7 +336,7 @@ export default function App() {
     [trips, tag]
   );
 
-  // ====== 核心：更新高亮 (含台湾修复) =====
+  // ====== 核心：更新高亮  =====
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -346,7 +346,25 @@ export default function App() {
     if (view === "world") {
       let countries = uniq(current.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
       
-      // 🟢 修复：含 CN 则强制含 TWN
+      // 检查数据里有没有去过香港的记录 (admin1 是 Hong Kong 或者 名字包含 Hong Kong)
+      const hasHK = current.some(t => 
+        (t.place.admin1 === "Hong Kong") || 
+        (t.place.name && t.place.name.includes("Hong Kong"))
+      );
+      if (hasHK && !countries.includes("HK")) {
+        countries.push("HK"); // 手动添加 HK 代码
+      }
+
+      // 检查数据里有没有去过澳门的记录
+      const hasMO = current.some(t => 
+        (t.place.admin1 === "Macau") || 
+        (t.place.name && t.place.name.includes("Macau"))
+      );
+      if (hasMO && !countries.includes("MO")) {
+        countries.push("MO"); // 手动添加 MO 代码
+      }
+
+      // 修复：含 CN 则强制含 TWN
       if (countries.includes("CN") && !countries.includes("CN-TW")) {
         countries = [...countries, "CN-TW"];
       }

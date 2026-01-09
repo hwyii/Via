@@ -28,6 +28,7 @@
 
 ### 2. Focused View (e.g., China/USA)
 ![Region View](./figure/region-view.png)
+![Region View](./figure/usa-view.png)
 
 ---
 

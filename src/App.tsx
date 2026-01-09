@@ -214,11 +214,22 @@ export default function App() {
   }
 
   function addTrip(it: Candidate) {
+    let finalIso = it.countryIso2;
+    let finalAdmin1 = it.admin1;
+    let finalName = it.displayName;
+    // 如果是香港 (HK) 或 澳门 (MO)，强制归为 CN，并手动修正 admin1
+    if (it.countryIso2 === "HK") {
+      finalIso = "CN";
+      finalAdmin1 = "Hong Kong"; 
+    } else if (it.countryIso2 === "MO") {
+      finalIso = "CN";
+      finalAdmin1 = "Macau";
+    }
     // 检查当前 tag 下，是否已经有 相同名字 且 相同国家 的记录
     const exists = trips.find(t => 
       t.tag === tag && 
-      t.place.name === it.displayName && 
-      t.place.countryIso2 === it.countryIso2
+      t.place.name === finalName && 
+      t.place.countryIso2 === finalIso // 检查 CN 而不是 HK
     );
 
     if (exists) {
@@ -232,8 +243,8 @@ export default function App() {
       date: today(),
       tag,
       place: {
-        name: it.displayName, lat: it.lat, lon: it.lon,
-        countryIso2: it.countryIso2, admin1: it.admin1
+        name: finalName, lat: it.lat, lon: it.lon,
+        countryIso2: finalIso, admin1: finalAdmin1
       }
     };
     const next = [t, ...trips];
@@ -347,18 +358,14 @@ export default function App() {
     else if (view === "cn") {
       const cnKeys = uniq(
         current
-          .filter((t) => (t.place.countryIso2 || "").toUpperCase() === "CN" && t.place.admin1)
+          .filter((t) => (t.place.countryIso2 || "").toUpperCase() === "CN") 
           .flatMap((t) => {
-            const raw = (t.place.admin1 || "").trim(); // 例如 "Zhejiang Province"
+            const raw = (t.place.admin1 || "").trim();
             
-            // 1. 清洗英文后缀 (得到 "Zhejiang")
             const clean = raw.replace(/( Province| City| Autonomous Region| AR| SAR)/gi, "").trim();
-            
-            // 2. 尝试映射为中文全称 (得到 "浙江省")
-            // 这样 "Zhejiang" 就能匹配阿里云地图里的 "浙江省" 了
             const zhName = CN_EN_TO_ZH[clean];
 
-            // 把 原始英文、清洗后英文、中文名 全部扔进去尝试匹配
+            // 🟢 特殊处理：如果是香港/澳门，可能 GeoJSON 里只有中文名，所以一定要确保 zhName 被传进去了
             return [raw, clean, zhName].filter(Boolean);
           })
       );

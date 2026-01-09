@@ -63,7 +63,11 @@ export const CN_ZH_TO_EN: Record<string, string> = {
     "西藏": "Tibet",
     "西藏自治区": "Tibet",
     "内蒙古": "Inner Mongolia",
-    "内蒙古自治区": "Inner Mongolia"
+    "内蒙古自治区": "Inner Mongolia",
+
+    "Hong Kong": "香港特别行政区",
+    "Macau": "澳门特别行政区",
+    "Macao": "澳门特别行政区",
   };
   
   export const US_ABBR_TO_NAME: Record<string, string> = {

@@ -297,7 +297,9 @@ export default function App() {
         saveTrips(newTrips);
 
         // 从导入的数据里提取所有 tag 名字
+        
         const importedTags = newTrips.map(t => t.tag);
+        const uniqueImportedTags = Array.from(new Set(importedTags));
         // 合并现有 tags 和 导入的 tags，并去重 (Set)
         const mergedTags = Array.from(new Set([...tags, ...importedTags]));
         
@@ -306,7 +308,10 @@ export default function App() {
            setTagsState(mergedTags);
            saveTags(mergedTags);
         }
-        // 👆👆👆 新增结束 👆👆👆
+        if (uniqueImportedTags.length > 0) {
+          // 只有当导入了新 Tag 时，才自动切换过去，让用户立马看到变化
+          setTag(uniqueImportedTags[0]); 
+        }
 
         alert(`Success! Loaded ${newTrips.length} footprints.`);
       })
@@ -387,7 +392,10 @@ export default function App() {
       features: current.map((t) => ({
         type: "Feature",
         geometry: { type: "Point", coordinates: [t.place.lon, t.place.lat] },
-        properties: { id: t.id, name: t.place.name }
+        properties: { 
+          ...t,         // 这样地图才能 get 到 "tag"
+          ...t.place    // 这样地图才能 get 到 "countryIso2"
+        }
       }))
     };
     (map.getSource("trip-points") as maplibregl.GeoJSONSource)?.setData(fc as any);
@@ -432,20 +440,34 @@ export default function App() {
       map.setMinZoom(2); map.setMaxZoom(7);
       map.easeTo({ center: [-98, 38], zoom: 3.0 });
     }
-    let dotFilter: any = null;
+    // 1. 基础过滤：只显示当前选中的 Tag
+    const tagFilter = ["==", ["get", "tag"], tag];
+
+    // 2. 区域过滤：根据 View 决定只显示哪个国家的点
+    let regionFilter: any = null;
 
     if (view === "cn") {
-      dotFilter = ["==", ["get", "countryIso2"], "CN"];
+      regionFilter = ["==", ["get", "countryIso2"], "CN"];
     } else if (view === "us") {
-      dotFilter = ["==", ["get", "countryIso2"], "US"];
+      regionFilter = ["==", ["get", "countryIso2"], "US"];
     }
-    if (map.getLayer("dots-glow")) {
-      map.setFilter("dots-glow", dotFilter);
+
+    // 3. 组合过滤器 (Tag + Region)
+    let finalFilter: any;
+    if (regionFilter) {
+      // 必须同时满足：是这个Tag 并且 是这个国家
+      finalFilter = ["all", tagFilter, regionFilter];
+    } else {
+      // 世界视图：只满足 Tag 即可
+      finalFilter = tagFilter;
     }
-    if (map.getLayer("dots-inner")) {
-      map.setFilter("dots-inner", dotFilter);
+
+    // 4. 🔴 关键修正：图层名字必须和你 addLayer 时的一样！
+    // 你的代码里 addLayer 叫 "trip-points-layer"
+    if (map.getLayer("trip-points-layer")) {
+      map.setFilter("trip-points-layer", finalFilter);
     }
-  }, [view, mapReady]);
+  }, [view, mapReady, tag]);
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", background: "#0b1220", overflow: "hidden" }}>

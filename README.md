@@ -66,7 +66,7 @@ For developers who want to contribute or modify features:
 
 ```bash
 # 1. Clone the repository
-git clone [git@github.com:hwyii/Via.git](git@github.com:hwyii/Via.git)
+git clone git@github.com:hwyii/Via.git
 
 # 2. Install dependencies
 npm install

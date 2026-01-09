@@ -35,7 +35,7 @@ export default function App() {
 
   // ====== Tag 状态管理 ======
   const [tags, setTagsState] = useState<string[]>(() => loadTags());
-  const [tag, setTag] = useState<TagId>("Me"); 
+  const [tag, setTag] = useState<TagId>(() => tags.length > 0 ? tags[0] : "Me");
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newTagVal, setNewTagVal] = useState("");
   const [editingTag, setEditingTag] = useState<string | null>(null);

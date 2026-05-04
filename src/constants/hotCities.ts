@@ -1,6 +1,6 @@
 import type { Candidate } from "../types";
 
-// 这里精选了一些热门城市，数据写死，点击秒加
+// Curated quick-add destinations.
 export const HOT_CITIES: Candidate[] = [
   { displayName: "Beijing, China", lat: 39.904, lon: 116.407, countryIso2: "CN", admin1: "Beijing" },
   { displayName: "Shenzhen, China", lat: 22.5455, lon: 114.068, countryIso2: "CN", admin1: "Guangdong" },

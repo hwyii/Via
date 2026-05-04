@@ -1,4 +1,4 @@
-// 静态映射数据表
+// Static mapping tables
 // src/constants/geoMaps.ts
 
 export const CN_ZH_TO_EN: Record<string, string> = {
@@ -163,5 +163,4 @@ export const CN_ZH_TO_EN: Record<string, string> = {
   "Hong Kong": "香港特别行政区",
   "Macao": "澳门特别行政区"
 };
-
 

@@ -26,7 +26,7 @@ export function clearTrips() {
 export function loadTags(): string[] {
   try {
     const raw = localStorage.getItem(TAGS_KEY);
-    if (!raw) return ["Me", "Couple"]; // 默认标签
+    if (!raw) return ["Me", "Couple"]; // Default tags
     const data = JSON.parse(raw);
     return Array.isArray(data) ? data : ["Me", "Couple"];
   } catch {
@@ -38,22 +38,22 @@ export function saveTags(tags: string[]) {
   localStorage.setItem(TAGS_KEY, JSON.stringify(tags));
 }
 
-// 🟢 导出功能：把数据变成文件下载
+// Download trips as JSON.
 export function exportData(trips: Trip[]) {
-  const dataStr = JSON.stringify(trips, null, 2); // 格式化，好看一点
+  const dataStr = JSON.stringify(trips, null, 2); // Pretty-print JSON
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   
   const a = document.createElement("a");
   a.href = url;
-  a.download = `travel-backup-${new Date().toISOString().slice(0, 10)}.json`; // 文件名带日期
+  a.download = `travel-backup-${new Date().toISOString().slice(0, 10)}.json`; // Dated filename
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-// 🟢 导入功能：解析文件内容
+// Parse an imported backup file.
 export function importData(file: File): Promise<Trip[]> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -73,4 +73,3 @@ export function importData(file: File): Promise<Trip[]> {
     reader.readAsText(file);
   });
 }
-

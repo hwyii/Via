@@ -34,16 +34,16 @@ export function normalizeUSStateName(admin1: string | null | undefined): string 
   let s = admin1.trim();
   if (!s) return null;
 
-  // 清理常见后缀/前缀
+  // Remove common prefixes and suffixes.
   s = s.replace(/^Commonwealth of\s+/i, "");
   s = s.replace(/\s+State$/i, "");
   s = s.replace(/\s+Commonwealth$/i, "");
 
-  // 去掉国家尾巴
+  // Remove country suffixes.
   s = s.replace(/,\s*United States.*$/i, "");
   s = s.replace(/,\s*USA.*$/i, "");
 
-  // DC 特判
+  // Normalize DC aliases.
   const up = s.toUpperCase().replace(/\./g, "").replace(/\s+/g, " ").trim();
   if (
     up === "DC" ||
@@ -55,10 +55,10 @@ export function normalizeUSStateName(admin1: string | null | undefined): string 
     return "District of Columbia";
   }
 
-  // 2位缩写
+  // Expand two-letter abbreviations.
   if (/^[A-Za-z]{2}$/.test(s)) return US_ABBR_TO_NAME[s.toUpperCase()] ?? null;
 
-  // 标准化空格
+  // Normalize spaces.
   s = s.replace(/\s+/g, " ").trim();
   return s || null;
 }

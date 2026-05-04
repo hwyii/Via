@@ -5,12 +5,11 @@ function normalizeAdmin1(countryIso2: string, address: any): string | null {
   const c = countryIso2.toUpperCase();
 
   if (c === "US") {
-    // 1. 尝试获取 state_code (如果 API 有返回的话)
+    // Prefer API state_code when available.
     const code = (address?.state_code || "").toString().toUpperCase();
     if (/^[A-Z]{2}$/.test(code)) return code;
     
-    // 2. 🟢 关键修复：如果没有缩写，就用 state 全名 (例如 "Alabama")
-    // App.tsx 里的 normalizeUSStateName 会负责处理这些全名
+    // Fall back to full state names.
     const stateName = (address?.state || "").toString().trim();
     if (stateName) return stateName;
     
@@ -40,7 +39,7 @@ export async function geocode(q: string): Promise<Candidate[]> {
   url.searchParams.set("addressdetails", "1");
   url.searchParams.set("limit", "8");
 
-  // 强制返回英文结果
+  // Request English results.
   url.searchParams.set("accept-language", "en");
 
   const res = await fetch(url.toString());

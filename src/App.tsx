@@ -13,17 +13,26 @@ import {
   getFlagEmoji 
 } from "./lib/utils";
 import { CN_EN_TO_ZH } from "./constants/geoMaps";
-import type { TagId, Trip, Candidate } from "./types";
+import type { TagId, Trip, Candidate, VisitType } from "./types";
 import { HOT_CITIES } from "./constants/hotCities";
 
 type ViewMode = "world" | "cn" | "us";
 
-// 🎨 颜色配置
+function getVisitType(trip: Pick<Trip, "visitType">): VisitType {
+  return trip.visitType ?? "visited";
+}
+
+// Theme colors
 const THEME = {
-  hiFill: "#45769c",    // 亮蓝色填充
-  hiOutline: "#729bb9", // 青色边框
-  hiOpacity: 1.0,       // 透明度
-  pointColor: "#29dff2" // 足迹点颜色
+  hiFill: "#45769c",    // Highlight fill
+  hiOutline: "#729bb9", // Highlight outline
+  hiOpacity: 1.0,       // Highlight opacity
+  pointColor: "#29dff2", // Footprint point
+  transitFill: "#d4d3d5",
+  transitOutline: "#d4d3d5",
+  transitOpacity: 0.26,
+  transitPointColor: "#d4d3d5",
+  transitPointOpacity: 0.48
 };
 
 export default function App() {
@@ -33,7 +42,7 @@ export default function App() {
   // const [exportScope, setExportScope] = useState<"all" | "current">("all");
   const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
 
-  // ====== Tag 状态管理 ======
+  // Tag state
   const [tags, setTagsState] = useState<string[]>(() => loadTags());
   const [tag, setTag] = useState<TagId>(() => tags.length > 0 ? tags[0] : "Me");
   const [isAddingTag, setIsAddingTag] = useState(false);
@@ -45,12 +54,13 @@ export default function App() {
   const [trips, setTrips] = useState<Trip[]>(() => loadTrips());
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [visitType, setVisitType] = useState<VisitType>("visited");
   const [q, setQ] = useState("");
   const [items, setItems] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  // ====== 统计与国旗 ======
+  // Stats and flags
   const stats = useMemo(() => {
     const current = trips.filter((t) => t.tag === tag);
     const countryCodes = uniq(current.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
@@ -61,7 +71,7 @@ export default function App() {
     };
   }, [trips, tag]);
 
-  // ====== Tag 操作逻辑 ======
+  // Tag actions
   function confirmAddTag() {
     const val = newTagVal.trim();
     if (val && !tags.includes(val)) {
@@ -93,15 +103,18 @@ export default function App() {
     const val = editTagVal.trim();
     if (val && val !== editingTag && !tags.includes(val)) {
       const next = tags.map(t => t === editingTag ? val : t);
+      const nextTrips = trips.map(t => t.tag === editingTag ? { ...t, tag: val } : t);
       setTagsState(next);
       saveTags(next);
+      setTrips(nextTrips);
+      saveTrips(nextTrips);
       if (tag === editingTag) setTag(val);
     }
     setEditingTag(null);
     setEditTagVal("");
   }
 
-  // ====== 地图初始化 ======
+  // Map setup
   useEffect(() => {
     if (!mapElRef.current) return;
 
@@ -134,43 +147,61 @@ export default function App() {
         map.addSource("cn-provinces", { type: "geojson", data: "/geo/cn-provinces.geojson" });
         map.addSource("us-states", { type: "geojson", data: "/geo/us-states.geojson" });
 
-        // === Base Layers ===
+        // Base layers
         const baseFill = "#152238";
         const baseLine = "#2b3a55";
 
-        // World Base
+        // World base
         map.addLayer({ id: "countries-base-fill", type: "fill", source: "countries", paint: { "fill-color": baseFill } });
         map.addLayer({ id: "countries-base-line", type: "line", source: "countries", paint: { "line-color": baseLine } });
 
-        // CN Base
+        // China base
         map.addLayer({ id: "cn-base-fill", type: "fill", source: "cn-provinces", paint: { "fill-color": baseFill } });
         map.addLayer({ id: "cn-base-line", type: "line", source: "cn-provinces", paint: { "line-color": baseLine } });
 
-        // US Base
+        // US base
         map.addLayer({ id: "us-base-fill", type: "fill", source: "us-states", paint: { "fill-color": baseFill } });
         map.addLayer({ id: "us-base-line", type: "line", source: "us-states", paint: { "line-color": baseLine } });
 
 
-        // === Highlight Layers (明确写出 ID，防止报错) ===
+        // Highlight layers
         const hiPaint = { "fill-color": THEME.hiFill, "fill-opacity": THEME.hiOpacity };
         const hiLinePaint = { "line-color": THEME.hiOutline, "line-width": 1.5 };
-        const emptyFilter: any = ["in", "id", ""]; // 初始不显示
+        const transitPaint = { "fill-color": THEME.transitFill, "fill-opacity": THEME.transitOpacity };
+        const transitLinePaint = { "line-color": THEME.transitOutline, "line-width": 1, "line-opacity": 0.7 };
+        const emptyFilter: any = ["in", "id", ""]; // Hidden by default
 
-        // 1. World Hi
+        // World highlights
+        map.addLayer({ id: "countries-transit", type: "fill", source: "countries", paint: transitPaint, filter: emptyFilter });
+        map.addLayer({ id: "countries-transit-line", type: "line", source: "countries", paint: transitLinePaint, filter: emptyFilter });
         map.addLayer({ id: "countries-hi", type: "fill", source: "countries", paint: hiPaint, filter: emptyFilter });
         map.addLayer({ id: "countries-hi-line", type: "line", source: "countries", paint: hiLinePaint, filter: emptyFilter });
 
-        // 2. CN Hi (注意 source 是 cn-provinces)
+        // China highlights
+        map.addLayer({ id: "cn-transit", type: "fill", source: "cn-provinces", paint: transitPaint, filter: emptyFilter });
+        map.addLayer({ id: "cn-transit-line", type: "line", source: "cn-provinces", paint: transitLinePaint, filter: emptyFilter });
         map.addLayer({ id: "cn-hi", type: "fill", source: "cn-provinces", paint: hiPaint, filter: emptyFilter });
         map.addLayer({ id: "cn-hi-line", type: "line", source: "cn-provinces", paint: hiLinePaint, filter: emptyFilter });
 
-        // 3. US Hi (注意 source 是 us-states)
+        // US highlights
+        map.addLayer({ id: "us-transit", type: "fill", source: "us-states", paint: transitPaint, filter: emptyFilter });
+        map.addLayer({ id: "us-transit-line", type: "line", source: "us-states", paint: transitLinePaint, filter: emptyFilter });
         map.addLayer({ id: "us-hi", type: "fill", source: "us-states", paint: hiPaint, filter: emptyFilter });
         map.addLayer({ id: "us-hi-line", type: "line", source: "us-states", paint: hiLinePaint, filter: emptyFilter });
 
 
-        // === Trip Points ===
+        // Trip points
         map.addSource("trip-points", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+        map.addLayer({
+          id: "trip-points-transit-layer", type: "circle", source: "trip-points",
+          paint: {
+            "circle-color": THEME.transitPointColor,
+            "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 2, 6, 4],
+            "circle-opacity": THEME.transitPointOpacity,
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "rgba(15,23,42,0.8)"
+          }
+        });
         map.addLayer({
           id: "trip-points-layer", type: "circle", source: "trip-points",
           paint: {
@@ -195,7 +226,7 @@ export default function App() {
     }
   }, []);
 
-  // ====== 搜索 ======
+  // Search
   useEffect(() => {
     const t = setTimeout(async () => {
       const s = q.trim();
@@ -213,11 +244,11 @@ export default function App() {
     mapRef.current?.easeTo({ center: [lon, lat], zoom, duration: 800 });
   }
 
-  function addTrip(it: Candidate) {
+  function addTrip(it: Candidate, selectedVisitType = visitType) {
     let finalIso = it.countryIso2;
     let finalAdmin1 = it.admin1;
     let finalName = it.displayName;
-    // 如果是香港 (HK) 或 澳门 (MO)，强制归为 CN，并手动修正 admin1
+    // Store Hong Kong and Macau under China.
     if (it.countryIso2 === "HK") {
       finalIso = "CN";
       finalAdmin1 = "Hong Kong"; 
@@ -225,23 +256,32 @@ export default function App() {
       finalIso = "CN";
       finalAdmin1 = "Macau";
     }
-    // 检查当前 tag 下，是否已经有 相同名字 且 相同国家 的记录
+    // Prevent duplicate places in the current tag.
     const exists = trips.find(t => 
       t.tag === tag && 
       t.place.name === finalName && 
-      t.place.countryIso2 === finalIso // 检查 CN 而不是 HK
+      t.place.countryIso2 === finalIso // Compare after normalization
     );
 
     if (exists) {
-      alert("⚠️ This place is already in your list!");
-      // 如果存在，直接飞过去，不添加
+      if (getVisitType(exists) !== selectedVisitType) {
+        const next = trips.map(t => t.id === exists.id ? { ...t, visitType: selectedVisitType } : t);
+        setTrips(next);
+        saveTrips(next);
+      } else {
+        alert("⚠️ This place is already in your list!");
+      }
       flyToLonLat(exists.place.lon, exists.place.lat, 4);
+      setQ("");
+      setItems([]);
+      setModalOpen(false);
       return;
     }
     const t: Trip = {
       id: uid(),
       date: today(),
       tag,
+      visitType: selectedVisitType,
       place: {
         name: finalName, lat: it.lat, lon: it.lon,
         countryIso2: finalIso, admin1: finalAdmin1
@@ -251,7 +291,7 @@ export default function App() {
     setTrips(next);
     saveTrips(next);
 
-    // 1. 判断目标国家，自动切换 View
+    // Auto-switch by destination country.
     if (it.countryIso2 === "CN") {
       setView("cn");
     } else if (it.countryIso2 === "US") {
@@ -260,12 +300,10 @@ export default function App() {
       setView("world");
     }
 
-    // 2. 延迟飞行
-    // 因为 setView 会触发 useEffect 去设置 maxBounds 和 easeTo (飞到国家中心)
-    // 我们需要等 view 切换完，再精细飞行到城市
+    // Wait for the view change before focusing the city.
     setTimeout(() => {
       flyToLonLat(it.lon, it.lat, 4);
-    }, 800); // 稍微延迟一点，让视图切换动画先走
+    }, 800); // Let the view animation start first
 
     setQ("");
     setItems([]);
@@ -274,18 +312,18 @@ export default function App() {
 
 
   function resetAll() {
-    // 加一个双重确认，防止手滑把整个旅行记录删没了
+    // Confirm before clearing this tag.
     if (!confirm(`DANGER: Are you sure you want to delete ALL ${filteredTrips.length} footprints for "${tag}"?`)) return;
     
-    // 逻辑：只保留其他 Tag 的数据，把当前 Tag 的全删掉
+    // Keep trips from other tags.
     const keep = trips.filter(t => t.tag !== tag);
     setTrips(keep);
     saveTrips(keep);
   }
 
-  // 🟢 新增：删除单条记录
+  // Delete one footprint.
   function deleteSingleTrip(id: string, e: React.MouseEvent) {
-    e.stopPropagation(); // 阻止冒泡！防止触发行的点击跳转事件
+    e.stopPropagation(); // Keep row click from firing
     
     if (!confirm("Remove this footprint?")) return;
 
@@ -294,7 +332,7 @@ export default function App() {
     saveTrips(next);
   }
 
-  // 🟢 处理文件上传
+  // Import backup data.
   function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -303,24 +341,24 @@ export default function App() {
 
     importData(file)
       .then((newTrips) => {
-        // 1. 更新足迹数据
+        // Replace footprint data.
         setTrips(newTrips);
         saveTrips(newTrips);
 
-        // 从导入的数据里提取所有 tag 名字
+        // Collect imported tag names.
         
         const importedTags = newTrips.map(t => t.tag);
         const uniqueImportedTags = Array.from(new Set(importedTags));
-        // 合并现有 tags 和 导入的 tags，并去重 (Set)
+        // Merge and dedupe tags.
         const mergedTags = Array.from(new Set([...tags, ...importedTags]));
         
-        // 如果发现了新 Tag，就保存
+        // Save newly imported tags.
         if (mergedTags.length > tags.length) {
            setTagsState(mergedTags);
            saveTags(mergedTags);
         }
         if (uniqueImportedTags.length > 0) {
-          // 只有当导入了新 Tag 时，才自动切换过去，让用户立马看到变化
+          // Show the first imported tag.
           setTag(uniqueImportedTags[0]); 
         }
 
@@ -336,78 +374,91 @@ export default function App() {
     [trips, tag]
   );
 
-  // ====== 核心：更新高亮  =====
+  // Update highlights.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
 
     const current = trips.filter((t) => t.tag === tag);
+    const visitedTrips = current.filter((t) => getVisitType(t) === "visited");
+    const transitTrips = current.filter((t) => getVisitType(t) === "transit");
+    const transitOnly = (transitKeys: string[], visitedKeys: string[]) =>
+      transitKeys.filter((key) => !visitedKeys.includes(key));
 
-    if (view === "world") {
-      let countries = uniq(current.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
-      
-      // 检查数据里有没有去过香港的记录 (admin1 是 Hong Kong 或者 名字包含 Hong Kong)
-      const hasHK = current.some(t => 
+    const getWorldCodes = (sourceTrips: Trip[]) => {
+      let codes = uniq(sourceTrips.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
+      const hasHK = sourceTrips.some(t => 
         (t.place.admin1 === "Hong Kong") || 
         (t.place.name && t.place.name.includes("Hong Kong"))
       );
-      if (hasHK && !countries.includes("HK")) {
-        countries.push("HK"); // 手动添加 HK 代码
-      }
+      if (hasHK && !codes.includes("HK")) codes.push("HK");
 
-      // 检查数据里有没有去过澳门的记录
-      const hasMO = current.some(t => 
+      const hasMO = sourceTrips.some(t => 
         (t.place.admin1 === "Macau") || 
         (t.place.name && t.place.name.includes("Macau"))
       );
-      if (hasMO && !countries.includes("MO")) {
-        countries.push("MO"); // 手动添加 MO 代码
-      }
+      if (hasMO && !codes.includes("MO")) codes.push("MO");
 
-      // 修复：含 CN 则强制含 TWN
-      if (countries.includes("CN") && !countries.includes("CN-TW")) {
-        countries = [...countries, "CN-TW"];
+      if (codes.includes("CN") && !codes.includes("CN-TW")) {
+        codes = [...codes, "CN-TW"];
       }
+      return codes;
+    };
 
+    const getCNKeys = (sourceTrips: Trip[]) => uniq(
+      sourceTrips
+        .filter((t) => (t.place.countryIso2 || "").toUpperCase() === "CN") 
+        .flatMap((t) => {
+          const raw = (t.place.admin1 || "").trim();
+          const clean = raw.replace(/( Province| City| Autonomous Region| AR| SAR)/gi, "").trim();
+          const zhName = CN_EN_TO_ZH[clean];
+          return [raw, clean, zhName].filter((value): value is string => Boolean(value));
+        })
+    );
+
+    const getUSKeys = (sourceTrips: Trip[]) => uniq(
+      sourceTrips
+        .filter((t) => (t.place.countryIso2 || "").toUpperCase() === "US" && t.place.admin1)
+        .flatMap((t) => {
+          const raw = (t.place.admin1 || "").trim();
+          const norm = normalizeUSStateName(raw);
+          return [raw, norm].filter((value): value is string => Boolean(value));
+        })
+    );
+
+    if (view === "world") {
+      const countries = getWorldCodes(visitedTrips);
+      const transitCountries = transitOnly(getWorldCodes(transitTrips), countries);
+      const transitFilter: any = ["in", ["get", "ISO3166-1-Alpha-2"], ["literal", transitCountries.length ? transitCountries : [""]]];
       const filter: any = ["in", ["get", "ISO3166-1-Alpha-2"], ["literal", countries.length ? countries : [""]]];
+      map.setFilter("countries-transit", transitFilter);
+      map.setFilter("countries-transit-line", transitFilter);
       map.setFilter("countries-hi", filter);
       map.setFilter("countries-hi-line", filter);
     } 
     else if (view === "cn") {
-      const cnKeys = uniq(
-        current
-          .filter((t) => (t.place.countryIso2 || "").toUpperCase() === "CN") 
-          .flatMap((t) => {
-            const raw = (t.place.admin1 || "").trim();
-            
-            const clean = raw.replace(/( Province| City| Autonomous Region| AR| SAR)/gi, "").trim();
-            const zhName = CN_EN_TO_ZH[clean];
-
-            // 🟢 特殊处理：如果是香港/澳门，可能 GeoJSON 里只有中文名，所以一定要确保 zhName 被传进去了
-            return [raw, clean, zhName].filter(Boolean);
-          })
-      );
+      const cnKeys = getCNKeys(visitedTrips);
+      const transitCnKeys = transitOnly(getCNKeys(transitTrips), cnKeys);
+      const transitFilter: any = ["in", ["get", "name"], ["literal", transitCnKeys.length ? transitCnKeys : [""]]];
       const filter: any = ["in", ["get", "name"], ["literal", cnKeys.length ? cnKeys : [""]]];
+      map.setFilter("cn-transit", transitFilter);
+      map.setFilter("cn-transit-line", transitFilter);
       map.setFilter("cn-hi", filter);
       map.setFilter("cn-hi-line", filter);
     } 
     else if (view === "us") {
-      const usStates = uniq(
-        current
-          .filter((t) => (t.place.countryIso2 || "").toUpperCase() === "US" && t.place.admin1)
-          .flatMap((t) => {
-            const raw = (t.place.admin1 || "").trim();
-            const norm = normalizeUSStateName(raw);
-            return [raw, norm].filter(Boolean);
-          })
-      );
+      const usStates = getUSKeys(visitedTrips);
+      const transitStates = transitOnly(getUSKeys(transitTrips), usStates);
+      const transitFilter: any = ["in", ["get", "name"], ["literal", transitStates.length ? transitStates : [""]]];
       const filter: any = ["in", ["get", "name"], ["literal", usStates.length ? usStates : [""]]];
+      map.setFilter("us-transit", transitFilter);
+      map.setFilter("us-transit-line", transitFilter);
       map.setFilter("us-hi", filter);
       map.setFilter("us-hi-line", filter);
     }
   }, [trips, tag, view, mapReady]);
 
-  // ====== 更新足迹点 =====
+  // Update footprint points.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
@@ -418,24 +469,25 @@ export default function App() {
         type: "Feature",
         geometry: { type: "Point", coordinates: [t.place.lon, t.place.lat] },
         properties: { 
-          ...t,         // 这样地图才能 get 到 "tag"
-          ...t.place    // 这样地图才能 get 到 "countryIso2"
+          ...t,         // Expose tag to the map
+          ...t.place,   // Expose countryIso2 to the map
+          visitType: getVisitType(t)
         }
       }))
     };
     (map.getSource("trip-points") as maplibregl.GeoJSONSource)?.setData(fc as any);
   }, [trips, tag, mapReady]);
 
-  // ====== 视图切换 ======
+  // View switching
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
 
-    // 先隐藏所有可能用到的图层
+    // Hide all map layers first.
     const allLayers = [
-      "countries-base-fill", "countries-base-line", "countries-hi", "countries-hi-line",
-      "cn-base-fill", "cn-base-line", "cn-hi", "cn-hi-line",
-      "us-base-fill", "us-base-line", "us-hi", "us-hi-line"
+      "countries-base-fill", "countries-base-line", "countries-transit", "countries-transit-line", "countries-hi", "countries-hi-line",
+      "cn-base-fill", "cn-base-line", "cn-transit", "cn-transit-line", "cn-hi", "cn-hi-line",
+      "us-base-fill", "us-base-line", "us-transit", "us-transit-line", "us-hi", "us-hi-line"
     ];
     allLayers.forEach(id => {
        if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", "none");
@@ -443,9 +495,9 @@ export default function App() {
 
     map.setMaxBounds(null);
 
-    // 显示指定前缀的图层
+    // Show layers by prefix.
     const setVisible = (prefix: string) => {
-      [`${prefix}-base-fill`, `${prefix}-base-line`, `${prefix}-hi`, `${prefix}-hi-line`].forEach(id => {
+      [`${prefix}-base-fill`, `${prefix}-base-line`, `${prefix}-transit`, `${prefix}-transit-line`, `${prefix}-hi`, `${prefix}-hi-line`].forEach(id => {
          if(map.getLayer(id)) map.setLayoutProperty(id, "visibility", "visible");
       });
     };
@@ -465,10 +517,10 @@ export default function App() {
       map.setMinZoom(2); map.setMaxZoom(7);
       map.easeTo({ center: [-98, 38], zoom: 3.0 });
     }
-    // 1. 基础过滤：只显示当前选中的 Tag
+    // Filter by selected tag.
     const tagFilter = ["==", ["get", "tag"], tag];
 
-    // 2. 区域过滤：根据 View 决定只显示哪个国家的点
+    // Filter by active region.
     let regionFilter: any = null;
 
     if (view === "cn") {
@@ -477,20 +529,26 @@ export default function App() {
       regionFilter = ["==", ["get", "countryIso2"], "US"];
     }
 
-    // 3. 组合过滤器 (Tag + Region)
-    let finalFilter: any;
+    const visitedFilter = ["==", ["get", "visitType"], "visited"];
+    const transitFilter = ["==", ["get", "visitType"], "transit"];
+    let finalVisitedFilter: any;
+    let finalTransitFilter: any;
     if (regionFilter) {
-      // 必须同时满足：是这个Tag 并且 是这个国家
-      finalFilter = ["all", tagFilter, regionFilter];
+      // Require both tag and region.
+      finalVisitedFilter = ["all", tagFilter, regionFilter, visitedFilter];
+      finalTransitFilter = ["all", tagFilter, regionFilter, transitFilter];
     } else {
-      // 世界视图：只满足 Tag 即可
-      finalFilter = tagFilter;
+      // World view only needs the tag.
+      finalVisitedFilter = ["all", tagFilter, visitedFilter];
+      finalTransitFilter = ["all", tagFilter, transitFilter];
     }
 
-    // 4. 🔴 关键修正：图层名字必须和你 addLayer 时的一样！
-    // 你的代码里 addLayer 叫 "trip-points-layer"
+    // Use the exact layer id from addLayer.
     if (map.getLayer("trip-points-layer")) {
-      map.setFilter("trip-points-layer", finalFilter);
+      map.setFilter("trip-points-layer", finalVisitedFilter);
+    }
+    if (map.getLayer("trip-points-transit-layer")) {
+      map.setFilter("trip-points-transit-layer", finalTransitFilter);
     }
   }, [view, mapReady, tag]);
 
@@ -561,10 +619,10 @@ export default function App() {
             }}>+</button>
           )}
         </div>
-        {/* 🟢 修改后的：数据备份区 (带筛选) */}
+        {/* Backup tools */}
         <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", gap: 10, position: "relative" }}>
             
-            {/* 1. 备份按钮 (点击切换菜单) */}
+            {/* Backup menu button */}
             <button 
               onClick={() => setDownloadMenuOpen(!downloadMenuOpen)}
               style={{ flex: 1, padding: "6px", fontSize: 12, background: "rgba(255,255,255,0.1)", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}
@@ -572,15 +630,15 @@ export default function App() {
               ⬇️ Backup
             </button>
 
-            {/* 2. 悬浮下拉菜单 (仅当开关打开时显示) */}
+            {/* Backup dropdown */}
             {downloadMenuOpen && (
               <div style={{
                 position: "absolute",
-                top: "100%", // 在按钮正下方
+                top: "100%", // Below the button
                 left: 0,
                 marginTop: 8,
                 width: 140,
-                background: "#1e293b", // 深色背景
+                background: "#1e293b", // Dark background
                 border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 8,
                 boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
@@ -589,11 +647,11 @@ export default function App() {
                 display: "flex", 
                 flexDirection: "column"
               }}>
-                {/* 选项 A: 全部 */}
+                {/* All data */}
                 <button
                   onClick={() => {
-                    exportData(trips); // 导出全部
-                    setDownloadMenuOpen(false); // 关闭菜单
+                    exportData(trips); // Export all
+                    setDownloadMenuOpen(false); // Close menu
                   }}
                   style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: "#e2e8f0", fontSize: 12, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
                   onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
@@ -602,10 +660,10 @@ export default function App() {
                   Download All
                 </button>
                 
-                {/* 选项 B: 仅当前 */}
+                {/* Current tag only */}
                 <button
                   onClick={() => {
-                    exportData(trips.filter(t => t.tag === tag)); // 仅导出当前 Tag
+                    exportData(trips.filter(t => t.tag === tag)); // Export current tag
                     setDownloadMenuOpen(false);
                   }}
                   style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: "#3b82f6", fontSize: 12, cursor: "pointer" }}
@@ -617,7 +675,7 @@ export default function App() {
               </div>
             )}
 
-            {/* 3. 恢复按钮 (保持不变) */}
+            {/* Restore button */}
             <label style={{ flex: 1, padding: "6px", fontSize: 12, background: "rgba(255,255,255,0.1)", color: "#fff", borderRadius: 6, cursor: "pointer", textAlign: "center" }}>
               ⬆️ Restore
               <input type="file" accept=".json" onChange={handleImport} style={{ display: "none" }} />
@@ -625,7 +683,7 @@ export default function App() {
          </div>
       </div>
 
-      {/* Flag Bar (底部国旗条 - 无背景) */}
+      {/* Flag bar */}
       <div style={{
         position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
         display: "flex", gap: 12, padding: "0 16px",
@@ -668,17 +726,17 @@ export default function App() {
               <h2 style={{ margin: 0, fontSize: 18 }}>Add to <span style={{color: THEME.pointColor}}>{tag}</span></h2>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 
-                {/* 🟢 恢复 Clear All 按钮 (只有当有数据时才显示) */}
+                {/* Clear All button */}
                 {filteredTrips.length > 0 && (
                   <button 
                     onClick={resetAll}
                     style={{ 
                       background: "transparent", 
                       border: "none", 
-                      color: "#ef4444", // 红色
+                      color: "#ef4444", // Red
                       fontSize: 13, 
                       cursor: "pointer", 
-                      textDecoration: "underline", // 下划线样式
+                      textDecoration: "underline", // Underline
                       fontWeight: 500
                     }}
                   >
@@ -686,7 +744,7 @@ export default function App() {
                   </button>
                 )}
 
-                {/* 原来的关闭按钮 */}
+                {/* Close button */}
                 <button 
                   onClick={() => setModalOpen(false)} 
                   style={{ border: "none", background: "transparent", color: "#94a3b8", fontSize: 20, cursor: "pointer" }}
@@ -696,11 +754,32 @@ export default function App() {
               </div>
             </div>
             
-            <input
-              value={q} onChange={(e) => setQ(e.target.value)}
-              placeholder="Search city (e.g. Kyoto)..." autoFocus
-              style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "1px solid #334155", background: "#0f172a", color: "#fff", outline: "none", fontSize: 15 }}
-            />
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                value={q} onChange={(e) => setQ(e.target.value)}
+                placeholder="Search city (e.g. Kyoto)..." autoFocus
+                style={{ flex: 1, minWidth: 0, padding: "12px 16px", borderRadius: 12, border: "1px solid #334155", background: "#0f172a", color: "#fff", outline: "none", fontSize: 15 }}
+              />
+              <select
+                value={visitType}
+                onChange={(e) => setVisitType(e.target.value as VisitType)}
+                style={{
+                  width: 112,
+                  padding: "0 10px",
+                  borderRadius: 12,
+                  border: "1px solid #334155",
+                  background: "#0f172a",
+                  color: "#e2e8f0",
+                  outline: "none",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer"
+                }}
+              >
+                <option value="visited">Visited</option>
+                <option value="transit">Transit</option>
+              </select>
+            </div>
             
             <div style={{ marginTop: 8, fontSize: 12, color: "#94a3b8", height: 20 }}>
               {loading && "Searching..."}
@@ -708,7 +787,7 @@ export default function App() {
             
             <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
               
-              {/* 🟢 1. 搜索结果 (优先级最高) */}
+              {/* Search results */}
               {items.map((it, idx) => (
                 <div key={idx} style={{ padding: "10px 14px", background: "#334155", borderRadius: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
@@ -719,7 +798,7 @@ export default function App() {
                 </div>
               ))}
 
-              {/* 🟢 2. 热门城市 (仅当没搜索、没结果时显示) */}
+              {/* Hot cities */}
               {!loading && items.length === 0 && q.length === 0 && (
                 <div style={{ marginBottom: 20 }}>
                    <div style={{ fontSize: 12, fontWeight: 700, color: "#60a5fa", marginBottom: 10, letterSpacing: "0.05em" }}>🔥 HOT DESTINATIONS</div>
@@ -743,7 +822,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* 🟢 3. 历史记录 (永远显示在最下方，方便删除) */}
+              {/* History */}
               {!loading && items.length === 0 && (
                 <>
                   <div style={{ 
@@ -764,7 +843,15 @@ export default function App() {
                     >
                       <div style={{ display: "flex", flexDirection: "column" }}>
                         <span style={{ fontSize: 14 }}>{t.place.name}</span>
-                        <span style={{ fontSize: 12, color: "#64748b" }}>{t.date}</span>
+                        <span style={{ fontSize: 12, color: "#64748b", display: "flex", gap: 8, alignItems: "center" }}>
+                          {t.date}
+                          <span style={{
+                            color: getVisitType(t) === "transit" ? "#cbd5e1" : THEME.pointColor,
+                            fontWeight: 700
+                          }}>
+                            {getVisitType(t) === "transit" ? "Transit" : "Visited"}
+                          </span>
+                        </span>
                       </div>
                       <button 
                         onClick={(e) => deleteSingleTrip(t.id, e)}

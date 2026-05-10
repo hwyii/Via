@@ -63,7 +63,8 @@ export default function App() {
   // Stats and flags
   const stats = useMemo(() => {
     const current = trips.filter((t) => t.tag === tag);
-    const countryCodes = uniq(current.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
+    const visitedTripsForStats = current.filter((t) => getVisitType(t) === "visited");
+    const countryCodes = uniq(visitedTripsForStats.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
     return {
       countries: countryCodes.length,
       footprints: current.length,

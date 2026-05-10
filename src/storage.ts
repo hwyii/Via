@@ -2,6 +2,7 @@ import type { Trip } from "./types";
 
 const KEY = "travel-footprints:trips";
 const TAGS_KEY = "travel-footprints:tags";
+const PARK_VISITS_KEY = "travel-footprints:park-visits";
 
 
 export function loadTrips(): Trip[] {
@@ -36,6 +37,21 @@ export function loadTags(): string[] {
 
 export function saveTags(tags: string[]) {
   localStorage.setItem(TAGS_KEY, JSON.stringify(tags));
+}
+
+export function loadParkVisits(): Record<string, string[]> {
+  try {
+    const raw = localStorage.getItem(PARK_VISITS_KEY);
+    if (!raw) return {};
+    const data = JSON.parse(raw);
+    return typeof data === "object" && data !== null && !Array.isArray(data) ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveParkVisits(visits: Record<string, string[]>) {
+  localStorage.setItem(PARK_VISITS_KEY, JSON.stringify(visits));
 }
 
 // Download trips as JSON.

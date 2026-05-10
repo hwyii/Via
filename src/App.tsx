@@ -3,7 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { geocode } from "./geocode";
-import { loadTrips, saveTrips, loadTags, saveTags, exportData, importData } from "./storage";
+import { loadTrips, saveTrips, loadTags, saveTags, exportData, importData, loadParkVisits, saveParkVisits } from "./storage";
 import { Pill } from "./components/UI/Pill";
 import { 
   uniq, 
@@ -13,6 +13,7 @@ import {
   getFlagEmoji 
 } from "./lib/utils";
 import { CN_EN_TO_ZH } from "./constants/geoMaps";
+import { NATIONAL_PARKS, PARKS_BY_STATE } from "./constants/nationalParks";
 import type { TagId, Trip, Candidate, VisitType } from "./types";
 import { HOT_CITIES } from "./constants/hotCities";
 
@@ -51,6 +52,7 @@ export default function App() {
   const [editTagVal, setEditTagVal] = useState("");
 
   const [view, setView] = useState<ViewMode>("world");
+  const [yearFilter, setYearFilter] = useState<string>("all");
   const [trips, setTrips] = useState<Trip[]>(() => loadTrips());
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -59,10 +61,12 @@ export default function App() {
   const [items, setItems] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [parkSidebarOpen, setParkSidebarOpen] = useState(false);
 
   // Stats and flags
   const stats = useMemo(() => {
-    const current = trips.filter((t) => t.tag === tag);
+    let current = trips.filter((t) => t.tag === tag);
+    if (yearFilter !== "all") current = current.filter(t => t.date.startsWith(yearFilter));
     const visitedTripsForStats = current.filter((t) => getVisitType(t) === "visited");
     const countryCodes = uniq(visitedTripsForStats.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
     return {
@@ -70,7 +74,13 @@ export default function App() {
       footprints: current.length,
       codes: countryCodes
     };
-  }, [trips, tag]);
+  }, [trips, tag, yearFilter]);
+
+  const availableYears = useMemo(
+    () => [...new Set(trips.filter(t => t.tag === tag).map(t => t.date.slice(0, 4)))].sort().reverse(),
+    [trips, tag]
+  );
+
 
   // Tag actions
   function confirmAddTag() {
@@ -131,7 +141,7 @@ export default function App() {
         style: minimalStyle,
         center: [0, 20],
         zoom: 1.4,
-        attributionControl: false
+        attributionControl: false,
       });
 
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
@@ -370,19 +380,32 @@ export default function App() {
     e.target.value = ""; 
   }
 
-  const filteredTrips = useMemo(
-    () => trips.filter((t) => t.tag === tag).sort((a, b) => (a.date < b.date ? 1 : -1)),
-    [trips, tag]
-  );
+  const filteredTrips = useMemo(() => {
+    let result = trips.filter((t) => t.tag === tag);
+    if (yearFilter !== "all") result = result.filter(t => t.date.startsWith(yearFilter));
+    return result.sort((a, b) => (a.date < b.date ? 1 : -1));
+  }, [trips, tag, yearFilter]);
+
+  const [parkVisits, setParkVisits] = useState<Record<string, string[]>>(() => loadParkVisits());
+  const visitedParks = useMemo(() => new Set(parkVisits[tag] ?? []), [parkVisits, tag]);
+
+  function togglePark(parkName: string) {
+    const current = parkVisits[tag] ?? [];
+    const next = current.includes(parkName)
+      ? current.filter(p => p !== parkName)
+      : [...current, parkName];
+    const updated = { ...parkVisits, [tag]: next };
+    setParkVisits(updated);
+    saveParkVisits(updated);
+  }
 
   // Update highlights.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
 
-    const current = trips.filter((t) => t.tag === tag);
-    const visitedTrips = current.filter((t) => getVisitType(t) === "visited");
-    const transitTrips = current.filter((t) => getVisitType(t) === "transit");
+    const visitedTrips = filteredTrips.filter((t) => getVisitType(t) === "visited");
+    const transitTrips = filteredTrips.filter((t) => getVisitType(t) === "transit");
     const transitOnly = (transitKeys: string[], visitedKeys: string[]) =>
       transitKeys.filter((key) => !visitedKeys.includes(key));
 
@@ -457,16 +480,15 @@ export default function App() {
       map.setFilter("us-hi", filter);
       map.setFilter("us-hi-line", filter);
     }
-  }, [trips, tag, view, mapReady]);
+  }, [filteredTrips, view, mapReady]);
 
   // Update footprint points.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
-    const current = trips.filter((t) => t.tag === tag);
     const fc = {
       type: "FeatureCollection",
-      features: current.map((t) => ({
+      features: filteredTrips.map((t) => ({
         type: "Feature",
         geometry: { type: "Point", coordinates: [t.place.lon, t.place.lat] },
         properties: { 
@@ -477,7 +499,7 @@ export default function App() {
       }))
     };
     (map.getSource("trip-points") as maplibregl.GeoJSONSource)?.setData(fc as any);
-  }, [trips, tag, mapReady]);
+  }, [filteredTrips, mapReady]);
 
   // View switching
   useEffect(() => {
@@ -511,7 +533,7 @@ export default function App() {
       setVisible("cn");
       map.setMaxBounds([[60, -10], [160, 60]]);
       map.setMinZoom(2); map.setMaxZoom(6);
-      map.easeTo({ center: [104, 28], zoom: 1.0 });
+      map.easeTo({ center: [108, 33], zoom: 1.0 });
     } else if (view === "us") {
       setVisible("us");
       map.setMaxBounds([[-180, 10], [-50, 75]]);
@@ -565,7 +587,7 @@ export default function App() {
       }}>
         <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: "0.02em" }}>Travel Footprints</div>
         <div style={{ marginTop: 4, fontSize: 13, opacity: 0.8 }}>
-          {stats.countries} Countries · {stats.footprints} Footprints
+          <span>{stats.countries}</span><span style={{ opacity: 0.4 }}>/195</span> Countries · {stats.footprints} Footprints
         </div>
         {mapError && <div style={{ color: "red", fontSize: 12 }}>{mapError}</div>}
 
@@ -620,6 +642,27 @@ export default function App() {
             }}>+</button>
           )}
         </div>
+        {/* Year filter */}
+        {availableYears.length > 0 && (
+          <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center" }}>
+            {["all", ...availableYears].map(y => (
+              <button
+                key={y}
+                onClick={() => setYearFilter(y)}
+                style={{
+                  padding: "3px 9px", borderRadius: 99, fontSize: 11, cursor: "pointer",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: yearFilter === y ? "rgba(255,255,255,0.92)" : "rgba(10,16,28,0.55)",
+                  color: yearFilter === y ? "#0b1220" : "rgba(255,255,255,0.75)",
+                  fontWeight: yearFilter === y ? 700 : 400,
+                }}
+              >
+                {y === "all" ? "All" : y}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Backup tools */}
         <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", gap: 10, position: "relative" }}>
             
@@ -713,6 +756,140 @@ export default function App() {
           display: "flex", alignItems: "center", justifyContent: "center"
         }}
       >＋</button>
+
+      {/* National Parks Sidebar */}
+      {view === "us" && (
+        <div style={{
+          position: "absolute",
+          top: 80,
+          right: 0,
+          display: "flex",
+          alignItems: "flex-start",
+          zIndex: 5,
+        }}>
+          {/* Sliding panel */}
+          <div style={{
+            width: parkSidebarOpen ? 240 : 0,
+            maxHeight: "calc(100vh - 150px)",
+            overflowX: "hidden",
+            overflowY: parkSidebarOpen ? "auto" : "hidden",
+            opacity: parkSidebarOpen ? 1 : 0,
+            transition: "width 0.3s ease, opacity 0.2s ease",
+            background: "rgba(15,23,42,0.88)",
+            backdropFilter: "blur(14px)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRight: "none",
+            borderRadius: "12px 0 0 12px",
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(255,255,255,0.15) transparent",
+          }}>
+            <div style={{ width: 240, padding: "14px 16px", color: "#f8fafc" }}>
+              <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4 }}>National Parks</div>
+              <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8 }}>
+                {visitedParks.size} / {NATIONAL_PARKS.length} visited
+              </div>
+              {/* Progress bar */}
+              <div style={{ height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 2, marginBottom: 14, overflow: "hidden" }}>
+                <div style={{
+                  height: "100%",
+                  width: `${(visitedParks.size / NATIONAL_PARKS.length) * 100}%`,
+                  background: `linear-gradient(to right, ${THEME.hiFill}, ${THEME.pointColor})`,
+                  borderRadius: 2,
+                  transition: "width 0.5s ease",
+                }} />
+              </div>
+              {/* Parks grouped by state */}
+              {Object.keys(PARKS_BY_STATE).sort().map(state => {
+                const parks = PARKS_BY_STATE[state];
+                const stateVisited = parks.filter(p => visitedParks.has(p.name)).length;
+                return (
+                  <div key={state} style={{ marginBottom: 10 }}>
+                    <div style={{
+                      fontSize: 10, fontWeight: 700,
+                      color: stateVisited > 0 ? "#94a3b8" : "#334155",
+                      letterSpacing: "0.08em", textTransform: "uppercase",
+                      marginBottom: 4, display: "flex", justifyContent: "space-between",
+                    }}>
+                      <span>{state}</span>
+                      {stateVisited > 0 && (
+                        <span style={{ color: THEME.pointColor }}>{stateVisited}/{parks.length}</span>
+                      )}
+                    </div>
+                    {parks.map(park => {
+                      const visited = visitedParks.has(park.name);
+                      return (
+                        <button
+                          key={park.name}
+                          onClick={() => togglePark(park.name)}
+                          title={visited ? "Mark as not visited" : "Mark as visited"}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 8,
+                            width: "100%", padding: "3px 0",
+                            background: "transparent", border: "none", cursor: "pointer",
+                            textAlign: "left", fontSize: 11.5,
+                            color: visited ? "#e2e8f0" : "#3a4a5e",
+                          }}
+                        >
+                          <span style={{
+                            width: 14, height: 14, borderRadius: "50%", flexShrink: 0,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            background: visited ? THEME.hiFill : "transparent",
+                            border: `1.5px solid ${visited ? THEME.hiOutline : "#2a3a55"}`,
+                            fontSize: 9, color: "#fff", fontWeight: 700,
+                          }}>
+                            {visited ? "✓" : ""}
+                          </span>
+                          <span style={{ fontSize: 12 }}>{park.icon}</span>
+                          {park.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Toggle tab */}
+          <button
+            onClick={() => setParkSidebarOpen(p => !p)}
+            title={parkSidebarOpen ? "Close parks panel" : "National Parks"}
+            style={{
+              flexShrink: 0,
+              width: 30,
+              padding: "14px 0",
+              background: "rgba(15,23,42,0.8)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderLeft: parkSidebarOpen ? "none" : "1px solid rgba(255,255,255,0.1)",
+              borderRadius: parkSidebarOpen ? "0 12px 12px 0" : "12px",
+              color: "#f8fafc",
+              cursor: "pointer",
+              backdropFilter: "blur(12px)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 6,
+              transition: "border-radius 0.3s ease",
+            }}
+          >
+            <span style={{ fontSize: 14 }}>🏕</span>
+            <span style={{
+              writingMode: "vertical-rl", textOrientation: "mixed",
+              fontSize: 9, letterSpacing: "0.1em", color: "#64748b",
+              fontWeight: 700, textTransform: "uppercase",
+            }}>Parks</span>
+            <span style={{
+              fontSize: 10, fontWeight: 700,
+              color: visitedParks.size > 0 ? THEME.pointColor : "#475569",
+            }}>
+              {visitedParks.size}/{NATIONAL_PARKS.length}
+            </span>
+            <span style={{ fontSize: 10, color: "#475569" }}>
+              {parkSidebarOpen ? "▶" : "◀"}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {modalOpen && (

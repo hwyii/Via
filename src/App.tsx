@@ -62,6 +62,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [parkSidebarOpen, setParkSidebarOpen] = useState(false);
+  const [flagListExpanded, setFlagListExpanded] = useState(false);
 
   // Stats and flags
   const stats = useMemo(() => {
@@ -75,6 +76,13 @@ export default function App() {
       codes: countryCodes
     };
   }, [trips, tag, yearFilter]);
+
+  const hasMoreFlags = stats.codes.length > 5;
+  const visibleFlagCodes = flagListExpanded ? stats.codes : stats.codes.slice(0, 5);
+
+  useEffect(() => {
+    if (!hasMoreFlags) setFlagListExpanded(false);
+  }, [hasMoreFlags]);
 
   const availableYears = useMemo(
     () => [...new Set(trips.filter(t => t.tag === tag).map(t => t.date.slice(0, 4)))].sort().reverse(),
@@ -730,14 +738,48 @@ export default function App() {
       {/* Flag bar */}
       <div style={{
         position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
-        display: "flex", gap: 12, padding: "0 16px",
-        maxWidth: "80vw", overflowX: "auto", scrollbarWidth: "none", pointerEvents: "none"
+        display: "flex", gap: 10, padding: "8px 12px",
+        maxWidth: "80vw", maxHeight: flagListExpanded ? "32vh" : 40,
+        overflowY: flagListExpanded ? "auto" : "hidden",
+        overflowX: "hidden", scrollbarWidth: "none",
+        flexWrap: flagListExpanded ? "wrap" : "nowrap",
+        justifyContent: "center", alignItems: "center",
+        borderRadius: 999,
+        background: stats.codes.length > 0 ? "rgba(15,23,42,0.42)" : "transparent",
+        backdropFilter: stats.codes.length > 0 ? "blur(10px)" : "none",
+        pointerEvents: "auto"
       }}>
-         {stats.codes.map(code => (
+         {visibleFlagCodes.map(code => (
            <span key={code} title={code} style={{ fontSize: 20, cursor: "default", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
              {getFlagEmoji(code)}
            </span>
          ))}
+         {hasMoreFlags && (
+           <button
+             type="button"
+             aria-label={flagListExpanded ? "Collapse flags" : "Expand flags"}
+             title={flagListExpanded ? "Show fewer flags" : "Show all flags"}
+             onClick={() => setFlagListExpanded((open) => !open)}
+             style={{
+               width: 24,
+               height: 24,
+               borderRadius: 999,
+               border: "1px solid rgba(255,255,255,0.22)",
+               background: "rgba(15,23,42,0.78)",
+               color: "#e2e8f0",
+               cursor: "pointer",
+               display: "flex",
+               alignItems: "center",
+               justifyContent: "center",
+               fontSize: 14,
+               lineHeight: 1,
+               padding: 0,
+               flex: "0 0 auto"
+             }}
+           >
+             {flagListExpanded ? "⌃" : "⌄"}
+           </button>
+         )}
       </div>
 
       {/* View Switch */}

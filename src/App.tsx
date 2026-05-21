@@ -731,22 +731,29 @@ export default function App() {
       {/* Flag bar */}
       <div style={{
         position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)",
-        display: "flex", gap: 10, padding: "8px 12px",
+        display: "flex", gap: 8, padding: "8px 10px",
         maxWidth: "80vw", maxHeight: flagListExpanded ? "32vh" : 40,
         overflowY: flagListExpanded ? "auto" : "hidden",
         overflowX: "hidden", scrollbarWidth: "none",
-        flexWrap: flagListExpanded ? "wrap" : "nowrap",
-        justifyContent: "center", alignItems: "center",
+        justifyContent: "center", alignItems: "start",
         borderRadius: 999,
         background: stats.codes.length > 0 ? "rgba(15,23,42,0.42)" : "transparent",
         backdropFilter: stats.codes.length > 0 ? "blur(10px)" : "none",
         pointerEvents: "auto"
       }}>
-         {visibleFlagCodes.map(code => (
-           <span key={code} title={code} style={{ fontSize: 20, cursor: "default", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
-             {getFlagEmoji(code)}
-           </span>
-         ))}
+         <div style={{
+           display: "grid",
+           gridTemplateColumns: `repeat(${Math.min(5, visibleFlagCodes.length || 1)}, 24px)`,
+           gridAutoRows: 24,
+           gap: "6px 8px",
+           justifyContent: "center"
+         }}>
+           {visibleFlagCodes.map(code => (
+             <span key={code} title={code} style={{ fontSize: 20, cursor: "default", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))", textAlign: "center", lineHeight: "24px" }}>
+               {getFlagEmoji(code)}
+             </span>
+           ))}
+         </div>
          {hasMoreFlags && (
            <button
              type="button"
@@ -767,7 +774,8 @@ export default function App() {
                fontSize: 14,
                lineHeight: 1,
                padding: 0,
-               flex: "0 0 auto"
+               flex: "0 0 auto",
+               marginTop: 0
              }}
            >
              {flagListExpanded ? "⌃" : "⌄"}

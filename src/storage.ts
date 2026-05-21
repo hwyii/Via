@@ -4,6 +4,11 @@ const KEY = "travel-footprints:trips";
 const TAGS_KEY = "travel-footprints:tags";
 const PARK_VISITS_KEY = "travel-footprints:park-visits";
 
+export type TravelBackup = {
+  version: 2;
+  tags: string[];
+  trips: Trip[];
+};
 
 export function loadTrips(): Trip[] {
   try {
@@ -55,8 +60,14 @@ export function saveParkVisits(visits: Record<string, string[]>) {
 }
 
 // Download trips as JSON.
-export function exportData(trips: Trip[]) {
-  const dataStr = JSON.stringify(trips, null, 2); // Pretty-print JSON
+export function exportData(trips: Trip[], tags: string[]) {
+  const validTags = tags.filter(Boolean);
+  const backup: TravelBackup = {
+    version: 2,
+    tags: validTags,
+    trips: trips.filter(t => validTags.includes(t.tag))
+  };
+  const dataStr = JSON.stringify(backup, null, 2); // Pretty-print JSON
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   
@@ -70,7 +81,7 @@ export function exportData(trips: Trip[]) {
 }
 
 // Parse an imported backup file.
-export function importData(file: File): Promise<Trip[]> {
+export function importData(file: File): Promise<{ trips: Trip[]; tags: string[] | null }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -78,9 +89,19 @@ export function importData(file: File): Promise<Trip[]> {
         const result = e.target?.result as string;
         const parsed = JSON.parse(result);
         if (Array.isArray(parsed)) {
-          resolve(parsed);
+          resolve({ trips: parsed, tags: null });
+        } else if (
+          parsed &&
+          typeof parsed === "object" &&
+          Array.isArray(parsed.trips) &&
+          Array.isArray(parsed.tags)
+        ) {
+          const rawTags = parsed.tags as unknown[];
+          const tags = Array.from(new Set(rawTags.filter((tag): tag is string => typeof tag === "string" && tag.trim() !== "")));
+          const trips = (parsed.trips as Trip[]).filter(t => tags.includes(t.tag));
+          resolve({ trips, tags });
         } else {
-          reject("Invalid data format: Not an array");
+          reject("Invalid data format");
         }
       } catch (err) {
         reject("Invalid JSON file");

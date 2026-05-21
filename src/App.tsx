@@ -107,8 +107,11 @@ export default function App() {
     if (!confirm(`Delete tag "${tToDelete}"?`)) return;
     const next = tags.filter(t => t !== tToDelete);
     if (next.length === 0) next.push("Me");
+    const nextTrips = trips.filter(t => t.tag !== tToDelete);
     setTagsState(next);
     saveTags(next);
+    setTrips(nextTrips);
+    saveTrips(nextTrips);
     if (tag === tToDelete) setTag(next[0]);
   }
 
@@ -359,29 +362,19 @@ export default function App() {
     if (!confirm("Importing will overwrite current data. Continue?")) return;
 
     importData(file)
-      .then((newTrips) => {
+      .then(({ trips: newTrips, tags: importedBackupTags }) => {
+        const fallbackTags = Array.from(new Set(newTrips.map(t => t.tag).filter(Boolean)));
+        const nextTags = importedBackupTags?.length ? importedBackupTags : (fallbackTags.length ? fallbackTags : ["Me"]);
+        const nextTrips = newTrips.filter(t => nextTags.includes(t.tag));
+
         // Replace footprint data.
-        setTrips(newTrips);
-        saveTrips(newTrips);
+        setTrips(nextTrips);
+        saveTrips(nextTrips);
+        setTagsState(nextTags);
+        saveTags(nextTags);
+        setTag(nextTags[0]);
 
-        // Collect imported tag names.
-        
-        const importedTags = newTrips.map(t => t.tag);
-        const uniqueImportedTags = Array.from(new Set(importedTags));
-        // Merge and dedupe tags.
-        const mergedTags = Array.from(new Set([...tags, ...importedTags]));
-        
-        // Save newly imported tags.
-        if (mergedTags.length > tags.length) {
-           setTagsState(mergedTags);
-           saveTags(mergedTags);
-        }
-        if (uniqueImportedTags.length > 0) {
-          // Show the first imported tag.
-          setTag(uniqueImportedTags[0]); 
-        }
-
-        alert(`Success! Loaded ${newTrips.length} footprints.`);
+        alert(`Success! Loaded ${nextTrips.length} footprints.`);
       })
       .catch((err) => alert("Failed to import: " + err));
     
@@ -702,7 +695,7 @@ export default function App() {
                 {/* All data */}
                 <button
                   onClick={() => {
-                    exportData(trips); // Export all
+                    exportData(trips, tags); // Export visible tags only
                     setDownloadMenuOpen(false); // Close menu
                   }}
                   style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: "#e2e8f0", fontSize: 12, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
@@ -715,7 +708,7 @@ export default function App() {
                 {/* Current tag only */}
                 <button
                   onClick={() => {
-                    exportData(trips.filter(t => t.tag === tag)); // Export current tag
+                    exportData(trips.filter(t => t.tag === tag), [tag]); // Export current tag
                     setDownloadMenuOpen(false);
                   }}
                   style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: "#3b82f6", fontSize: 12, cursor: "pointer" }}

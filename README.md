@@ -8,7 +8,8 @@
 ![MapLibre](https://img.shields.io/badge/MapLibre-GL-orange.svg)
 ![Vite](https://img.shields.io/badge/Vite-4.0-646cff.svg)
 
-
+---
+Use ![this](https://viatravel.edgeone.cool/?eo_token=7ebce4e03eea93d3d2c3e96551538a2f&eo_time=1779335384) for Main land China.
 ---
 
 ## ✨ Key Features

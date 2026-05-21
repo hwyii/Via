@@ -9,10 +9,10 @@
 ![Vite](https://img.shields.io/badge/Vite-4.0-646cff.svg)
 
 ---
-Use ![this](https://viatravel.edgeone.cool/?eo_token=7ebce4e03eea93d3d2c3e96551538a2f&eo_time=1779335384) for Main land China.
----
 
 ## ✨ Key Features
+
+Use ![](https://viatravel.edgeone.cool/?eo_token=7ebce4e03eea93d3d2c3e96551538a2f&eo_time=1779335384) for main land China.
 
 * **🔒 Privacy First**: All data is stored locally in your browser (`localStorage`). No data is ever sent to a server. Your memories belong to you.
 * **🌏 Smart Views**: Automatically switches between **World**, **China**, and **USA** views. 

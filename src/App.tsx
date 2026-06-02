@@ -13,7 +13,7 @@ import {
   getFlagEmoji 
 } from "./lib/utils";
 import { CN_EN_TO_ZH } from "./constants/geoMaps";
-import { NATIONAL_PARKS, PARKS_BY_STATE } from "./constants/nationalParks";
+import { NATIONAL_PARKS, PARKS_BY_STATE, PARK_COORDS } from "./constants/nationalParks";
 import type { TagId, Trip, Candidate, VisitType } from "./types";
 import { HOT_CITIES } from "./constants/hotCities";
 
@@ -39,6 +39,7 @@ const THEME = {
 export default function App() {
   const mapElRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const parkMarkersRef = useRef<maplibregl.Marker[]>([]);
   const [mapReady, setMapReady] = useState(false);
   // const [exportScope, setExportScope] = useState<"all" | "current">("all");
   const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
@@ -62,6 +63,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [parkSidebarOpen, setParkSidebarOpen] = useState(false);
+  const [showParksOnMap, setShowParksOnMap] = useState(false);
   const [flagListExpanded, setFlagListExpanded] = useState(false);
 
   // Stats and flags
@@ -502,6 +504,59 @@ export default function App() {
     (map.getSource("trip-points") as maplibregl.GeoJSONSource)?.setData(fc as any);
   }, [filteredTrips, mapReady]);
 
+  // Show visited national parks as small map icons in the USA view.
+  useEffect(() => {
+    const clearParkMarkers = () => {
+      parkMarkersRef.current.forEach(marker => marker.remove());
+      parkMarkersRef.current = [];
+    };
+    const map = mapRef.current;
+
+    clearParkMarkers();
+
+    if (!map || !mapReady || view !== "us" || !showParksOnMap) return clearParkMarkers;
+
+    NATIONAL_PARKS.forEach((park) => {
+      if (!visitedParks.has(park.name)) return;
+      const coords = PARK_COORDS[park.name];
+      if (!coords) return;
+
+      const el = document.createElement("button");
+      el.type = "button";
+      el.title = park.name;
+      el.setAttribute("aria-label", park.name);
+      el.textContent = park.icon;
+      Object.assign(el.style, {
+        width: "24px",
+        height: "24px",
+        borderRadius: "50%",
+        border: `1px solid ${THEME.hiOutline}`,
+        background: "rgba(15,23,42,0.82)",
+        boxShadow: `0 0 0 2px rgba(41,223,242,0.18), 0 4px 12px rgba(0,0,0,0.35)`,
+        color: "#fff",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "14px",
+        lineHeight: "1",
+        padding: "0",
+        pointerEvents: "auto",
+      });
+
+      el.addEventListener("click", () => {
+        map.easeTo({ center: coords, zoom: Math.max(map.getZoom(), 5), duration: 600 });
+      });
+
+      const marker = new maplibregl.Marker({ element: el, anchor: "center" })
+        .setLngLat(coords)
+        .addTo(map);
+      parkMarkersRef.current.push(marker);
+    });
+
+    return clearParkMarkers;
+  }, [mapReady, showParksOnMap, view, visitedParks]);
+
   // View switching
   useEffect(() => {
     const map = mapRef.current;
@@ -827,7 +882,53 @@ export default function App() {
             scrollbarColor: "rgba(255,255,255,0.15) transparent",
           }}>
             <div style={{ width: 240, padding: "14px 16px", color: "#f8fafc" }}>
-              <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4 }}>National Parks</div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
+                <div style={{ fontWeight: 700, fontSize: 13 }}>National Parks</div>
+                <label
+                  title="Show visited parks on map"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    color: showParksOnMap ? "#c8f7ff" : "#64748b",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    userSelect: "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <span>Show on map</span>
+                  <input
+                    type="checkbox"
+                    checked={showParksOnMap}
+                    onChange={(e) => setShowParksOnMap(e.target.checked)}
+                    style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+                  />
+                  <span style={{
+                    width: 28,
+                    height: 16,
+                    borderRadius: 999,
+                    background: showParksOnMap ? THEME.hiFill : "rgba(51,65,85,0.9)",
+                    border: `1px solid ${showParksOnMap ? THEME.hiOutline : "rgba(148,163,184,0.22)"}`,
+                    position: "relative",
+                    flexShrink: 0,
+                    transition: "background 0.2s ease, border-color 0.2s ease",
+                  }}>
+                    <span style={{
+                      position: "absolute",
+                      top: 2,
+                      left: showParksOnMap ? 14 : 2,
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      background: showParksOnMap ? THEME.pointColor : "#94a3b8",
+                      boxShadow: showParksOnMap ? "0 0 8px rgba(41,223,242,0.7)" : "none",
+                      transition: "left 0.2s ease, background 0.2s ease",
+                    }} />
+                  </span>
+                </label>
+              </div>
               <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8 }}>
                 {visitedParks.size} / {NATIONAL_PARKS.length} visited
               </div>

@@ -3,6 +3,7 @@ import type { Trip } from "./types";
 const KEY = "travel-footprints:trips";
 const TAGS_KEY = "travel-footprints:tags";
 const PARK_VISITS_KEY = "travel-footprints:park-visits";
+const PARK_MAP_VISIBILITY_KEY = "travel-footprints:park-map-visible";
 
 export type TravelBackup = {
   version: 2;
@@ -57,6 +58,18 @@ export function loadParkVisits(): Record<string, string[]> {
 
 export function saveParkVisits(visits: Record<string, string[]>) {
   localStorage.setItem(PARK_VISITS_KEY, JSON.stringify(visits));
+}
+
+export function loadParkMapVisibility(): boolean {
+  try {
+    return localStorage.getItem(PARK_MAP_VISIBILITY_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function saveParkMapVisibility(visible: boolean) {
+  localStorage.setItem(PARK_MAP_VISIBILITY_KEY, String(visible));
 }
 
 // Download trips as JSON.

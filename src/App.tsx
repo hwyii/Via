@@ -3,7 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { geocode } from "./geocode";
-import { loadTrips, saveTrips, loadTags, saveTags, exportData, importData, loadParkVisits, saveParkVisits } from "./storage";
+import { loadTrips, saveTrips, loadTags, saveTags, exportData, importData, loadParkVisits, saveParkVisits, loadParkMapVisibility, saveParkMapVisibility } from "./storage";
 import { Pill } from "./components/UI/Pill";
 import { 
   uniq, 
@@ -19,8 +19,23 @@ import { HOT_CITIES } from "./constants/hotCities";
 
 type ViewMode = "world" | "cn" | "us";
 
+const CHINA_REGION_TOTAL = 34;
+const US_STATE_TOTAL = 50;
+
 function getVisitType(trip: Pick<Trip, "visitType">): VisitType {
   return trip.visitType ?? "visited";
+}
+
+function getChinaRegionKey(trip: Trip): string | null {
+  const raw = (trip.place.admin1 || "").trim();
+  if (!raw) return null;
+  const clean = raw.replace(/( Province| City| Autonomous Region| AR| SAR)/gi, "").trim();
+  return CN_EN_TO_ZH[clean] || clean || raw;
+}
+
+function getUSStateKey(trip: Trip): string | null {
+  const raw = (trip.place.admin1 || "").trim();
+  return normalizeUSStateName(raw) || raw || null;
 }
 
 // Theme colors
@@ -63,7 +78,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [parkSidebarOpen, setParkSidebarOpen] = useState(false);
-  const [showParksOnMap, setShowParksOnMap] = useState(false);
+  const [showParksOnMap, setShowParksOnMap] = useState(() => loadParkMapVisibility());
   const [flagListExpanded, setFlagListExpanded] = useState(false);
 
   // Stats and flags
@@ -72,12 +87,43 @@ export default function App() {
     if (yearFilter !== "all") current = current.filter(t => t.date.startsWith(yearFilter));
     const visitedTripsForStats = current.filter((t) => getVisitType(t) === "visited");
     const countryCodes = uniq(visitedTripsForStats.map((t) => (t.place.countryIso2 || "").toUpperCase()).filter(Boolean));
+
+    const chinaTrips = current.filter((t) => (t.place.countryIso2 || "").toUpperCase() === "CN");
+    const visitedChinaTrips = visitedTripsForStats.filter((t) => (t.place.countryIso2 || "").toUpperCase() === "CN");
+    const chinaRegions = uniq(
+      visitedChinaTrips
+        .map(getChinaRegionKey)
+        .filter((value): value is string => Boolean(value))
+    );
+
+    const usTrips = current.filter((t) => (t.place.countryIso2 || "").toUpperCase() === "US");
+    const visitedUSTrips = visitedTripsForStats.filter((t) => (t.place.countryIso2 || "").toUpperCase() === "US");
+    const usStates = uniq(
+      visitedUSTrips
+        .map(getUSStateKey)
+        .filter((value): value is string => Boolean(value))
+    );
+
     return {
       countries: countryCodes.length,
+      chinaRegions: chinaRegions.length,
+      usStates: usStates.length,
       footprints: current.length,
+      chinaFootprints: chinaTrips.length,
+      usFootprints: usTrips.length,
       codes: countryCodes
     };
   }, [trips, tag, yearFilter]);
+
+  const primaryStatsLabel = useMemo(() => {
+    if (view === "cn") {
+      return `${stats.chinaRegions}/${CHINA_REGION_TOTAL} Provinces · ${stats.chinaFootprints} Footprints`;
+    }
+    if (view === "us") {
+      return `${stats.usStates}/${US_STATE_TOTAL} States · ${stats.usFootprints} Footprints`;
+    }
+    return `${stats.countries}/195 Countries · ${stats.footprints} Footprints`;
+  }, [stats, view]);
 
   const hasMoreFlags = stats.codes.length > 5;
   const visibleFlagCodes = flagListExpanded ? stats.codes : stats.codes.slice(0, 5);
@@ -85,6 +131,10 @@ export default function App() {
   useEffect(() => {
     if (!hasMoreFlags) setFlagListExpanded(false);
   }, [hasMoreFlags]);
+
+  useEffect(() => {
+    saveParkMapVisibility(showParksOnMap);
+  }, [showParksOnMap]);
 
   const availableYears = useMemo(
     () => [...new Set(trips.filter(t => t.tag === tag).map(t => t.date.slice(0, 4)))].sort().reverse(),
@@ -643,7 +693,7 @@ export default function App() {
       }}>
         <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: "0.02em" }}>Travel Footprints</div>
         <div style={{ marginTop: 4, fontSize: 13, opacity: 0.8 }}>
-          <span>{stats.countries}</span><span style={{ opacity: 0.4 }}>/195</span> Countries · {stats.footprints} Footprints
+          {primaryStatsLabel}
         </div>
         {mapError && <div style={{ color: "red", fontSize: 12 }}>{mapError}</div>}
 

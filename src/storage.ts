@@ -11,6 +11,31 @@ export type TravelBackup = {
   trips: Trip[];
 };
 
+function parsePublishedData(value: unknown): TravelBackup {
+  if (Array.isArray(value)) {
+    const trips = value as Trip[];
+    return {
+      version: 2,
+      tags: Array.from(new Set(trips.map((trip) => trip.tag).filter(Boolean))),
+      trips,
+    };
+  }
+
+  if (value && typeof value === "object") {
+    const data = value as Partial<TravelBackup>;
+    if (Array.isArray(data.trips)) {
+      const inferredTags = Array.from(new Set(data.trips.map((trip) => trip.tag).filter(Boolean)));
+      return {
+        version: 2,
+        tags: Array.isArray(data.tags) && data.tags.length ? data.tags : inferredTags,
+        trips: data.trips,
+      };
+    }
+  }
+
+  throw new Error("Invalid published footprint data format");
+}
+
 export function loadTrips(): Trip[] {
   try {
     const raw = localStorage.getItem(KEY);
@@ -43,6 +68,23 @@ export function loadTags(): string[] {
 
 export function saveTags(tags: string[]) {
   localStorage.setItem(TAGS_KEY, JSON.stringify(tags));
+}
+
+export async function loadPublishedData(): Promise<TravelBackup> {
+  const githubUrl = `https://raw.githubusercontent.com/hwyii/Via/main/public/footprints.json?v=${Date.now()}`;
+
+  try {
+    const response = await fetch(githubUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+    return parsePublishedData(await response.json());
+  } catch (githubError) {
+    const fallback = await fetch("/footprints.json", { cache: "no-store" });
+    if (!fallback.ok) {
+      const detail = githubError instanceof Error ? githubError.message : String(githubError);
+      throw new Error(`Could not load published footprints (${detail}; fallback ${fallback.status})`);
+    }
+    return parsePublishedData(await fallback.json());
+  }
 }
 
 export function loadParkVisits(): Record<string, string[]> {
@@ -116,7 +158,7 @@ export function importData(file: File): Promise<{ trips: Trip[]; tags: string[] 
         } else {
           reject("Invalid data format");
         }
-      } catch (err) {
+      } catch {
         reject("Invalid JSON file");
       }
     };

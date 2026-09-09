@@ -1,0 +1,1272 @@
+{
+  "version": 2,
+  "tags": [
+    "🌍"
+  ],
+  "trips": [
+    {
+      "id": "mt6i6oao-is3rx0",
+      "date": "2026-08-24",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Heyuan, Guangdong, 517000, China",
+        "lat": 24.1014769,
+        "lon": 115.0577538,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mt6i6f65-eskr2r",
+      "date": "2026-08-24",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Shaoguan City, Guangdong, China",
+        "lat": 24.8309489,
+        "lon": 113.8155263,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mt6i5xpj-8nfvai",
+      "date": "2026-08-24",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Huizhou, Guangdong, China",
+        "lat": 23.1125153,
+        "lon": 114.4127007,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mt6i5s6m-i4q9bv",
+      "date": "2026-08-24",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Zhuhai, Guangdong, China",
+        "lat": 22.273734,
+        "lon": 113.5721327,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mt6i5npq-fu0v4m",
+      "date": "2026-08-24",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Dongguan, Guangdong, China",
+        "lat": 23.0183568,
+        "lon": 113.7452332,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "msy38skm-vjxdal",
+      "date": "2026-08-18",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Chapel Hill, Orange County, North Carolina, United States",
+        "lat": 35.9131542,
+        "lon": -79.05578,
+        "countryIso2": "US",
+        "admin1": "North Carolina"
+      }
+    },
+    {
+      "id": "msp9ypqa-fvi1b3",
+      "date": "2026-08-11",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Bar Harbor, Hancock County, Maine, United States",
+        "lat": 44.3876378,
+        "lon": -68.2043361,
+        "countryIso2": "US",
+        "admin1": "Maine"
+      }
+    },
+    {
+      "id": "msp9y0sm-h3ahq4",
+      "date": "2026-08-11",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Portland, Cumberland County, Maine, United States",
+        "lat": 43.6573605,
+        "lon": -70.2586618,
+        "countryIso2": "US",
+        "admin1": "Maine"
+      }
+    },
+    {
+      "id": "msp9xqe6-zkgl0d",
+      "date": "2026-08-11",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Acadia National Park, Bar Harbor, Hancock County, Maine, 04609, United States",
+        "lat": 44.3563115,
+        "lon": -68.2154787,
+        "countryIso2": "US",
+        "admin1": "Maine"
+      }
+    },
+    {
+      "id": "mrv2ia2m-9yujrf",
+      "date": "2026-07-21",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Rehoboth Beach, Sussex County, Delaware, 19771, United States",
+        "lat": 38.7164771,
+        "lon": -75.0835107,
+        "countryIso2": "US",
+        "admin1": "Delaware"
+      }
+    },
+    {
+      "id": "mrv2bt1c-wg93gb",
+      "date": "2026-07-21",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Dover, Kent County, Delaware, United States",
+        "lat": 39.158168,
+        "lon": -75.5243682,
+        "countryIso2": "US",
+        "admin1": "Delaware"
+      }
+    },
+    {
+      "id": "mrtoiovq-lhgnl4",
+      "date": "2026-07-20",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Ann Arbor, Washtenaw County, Michigan, United States",
+        "lat": 42.2813722,
+        "lon": -83.7484616,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mrtohy53-co87jv",
+      "date": "2026-07-20",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Frankenmuth, Saginaw County, Michigan, United States",
+        "lat": 43.3323684,
+        "lon": -83.7392288,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mrtoh21l-u9drhf",
+      "date": "2026-07-20",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Holland, Ottawa County, Michigan, 49423, United States",
+        "lat": 42.7876022,
+        "lon": -86.1090828,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mrthoy1w-vr86g6",
+      "date": "2026-07-20",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Lansing, Ingham County, Michigan, United States",
+        "lat": 42.7338254,
+        "lon": -84.5546295,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mrthlegw-rk30o5",
+      "date": "2026-07-20",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Morgantown, Monongalia County, West Virginia, United States",
+        "lat": 39.6296809,
+        "lon": -79.9559437,
+        "countryIso2": "US",
+        "admin1": "West Virginia"
+      }
+    },
+    {
+      "id": "mrthl0o5-yvhz7h",
+      "date": "2026-07-20",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Mineral Wells, Wood County, West Virginia, 26150, United States",
+        "lat": 39.1904082,
+        "lon": -81.5320773,
+        "countryIso2": "US",
+        "admin1": "West Virginia"
+      }
+    },
+    {
+      "id": "mrp4eym9-zx41r3",
+      "date": "2026-07-17",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Pittsburgh, Allegheny County, Pennsylvania, United States",
+        "lat": 40.4406968,
+        "lon": -80.0025666,
+        "countryIso2": "US",
+        "admin1": "Pennsylvania"
+      }
+    },
+    {
+      "id": "mrnuuoas-yc25yw",
+      "date": "2026-07-16",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Alexandria, Virginia, United States",
+        "lat": 38.8051095,
+        "lon": -77.0470229,
+        "countryIso2": "US",
+        "admin1": "Virginia"
+      }
+    },
+    {
+      "id": "mrhz3zwz-1jo67j",
+      "date": "2026-07-12",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Rockville, Montgomery County, Maryland, United States",
+        "lat": 39.0817985,
+        "lon": -77.1516844,
+        "countryIso2": "US",
+        "admin1": "Maryland"
+      }
+    },
+    {
+      "id": "mrhz2p4q-uzogr3",
+      "date": "2026-07-12",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Old Rag Mountain, Madison County, Virginia, 22719, United States",
+        "lat": 38.5517905,
+        "lon": -78.3141702,
+        "countryIso2": "US",
+        "admin1": "Virginia"
+      }
+    },
+    {
+      "id": "mr3o1k4o-q3apjr",
+      "date": "2026-07-02",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Baltimore, Maryland, United States",
+        "lat": 39.2908816,
+        "lon": -76.610759,
+        "countryIso2": "US",
+        "admin1": "Maryland"
+      }
+    },
+    {
+      "id": "mpsawgm0-m9srrl",
+      "date": "2026-05-30",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Washington, District of Columbia, United States",
+        "lat": 38.8950982,
+        "lon": -77.0363849,
+        "countryIso2": "US",
+        "admin1": "District of Columbia"
+      }
+    },
+    {
+      "id": "mpezgbz9-x1zmtl",
+      "date": "2026-05-21",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Arlington, Arlington County, Virginia, 22209, United States",
+        "lat": 38.8903961,
+        "lon": -77.0841585,
+        "countryIso2": "US",
+        "admin1": "Virginia"
+      }
+    },
+    {
+      "id": "mosqp63q-b17quy",
+      "date": "2026-05-05",
+      "tag": "🌍",
+      "visitType": "transit",
+      "place": {
+        "name": "Dubai, United Arab Emirates",
+        "lat": 25.2296341,
+        "lon": 55.289585,
+        "countryIso2": "AE",
+        "admin1": null
+      }
+    },
+    {
+      "id": "mosqj0qp-9b5xqa",
+      "date": "2026-05-05",
+      "tag": "🌍",
+      "visitType": "transit",
+      "place": {
+        "name": "Seoul, South Korea",
+        "lat": 37.5666791,
+        "lon": 126.9782914,
+        "countryIso2": "KR",
+        "admin1": null
+      }
+    },
+    {
+      "id": "mosqiely-pbfb9j",
+      "date": "2026-05-05",
+      "tag": "🌍",
+      "visitType": "transit",
+      "place": {
+        "name": "Pairs, Saint-Christophe, Confolens, Charente, Nouvelle-Aquitaine, Metropolitan France, 16420, France",
+        "lat": 45.9783698,
+        "lon": 0.836648,
+        "countryIso2": "FR",
+        "admin1": null
+      }
+    },
+    {
+      "id": "mosqhuv2-i24kpq",
+      "date": "2026-05-05",
+      "tag": "🌍",
+      "visitType": "transit",
+      "place": {
+        "name": "Denver, Colorado, United States",
+        "lat": 39.7392364,
+        "lon": -104.984862,
+        "countryIso2": "US",
+        "admin1": "Colorado"
+      }
+    },
+    {
+      "id": "moorcboy-gzsm1m",
+      "date": "2026-05-02",
+      "tag": "🌍",
+      "place": {
+        "name": "Casablanca, Pachalik de Casablanca باشوية الدار البيضاء, Prefecture of Casablanca, Casablanca-Settat, Morocco",
+        "lat": 33.5945144,
+        "lon": -7.6200284,
+        "countryIso2": "MA",
+        "admin1": null
+      }
+    },
+    {
+      "id": "moorbgya-s1haf5",
+      "date": "2026-05-02",
+      "tag": "🌍",
+      "place": {
+        "name": "Tangier, Pachalik de Tanger باشوية طنجة, Prefecture of Tangier - Assilah, Tangier-Tetouan-Al Hoceima, Morocco",
+        "lat": 35.7696302,
+        "lon": -5.8033522,
+        "countryIso2": "MA",
+        "admin1": null
+      }
+    },
+    {
+      "id": "mmc9suo1-ucqma8",
+      "date": "2026-03-04",
+      "tag": "🌍",
+      "place": {
+        "name": "Joshua Tree, San Bernardino County, California, United States",
+        "lat": 34.123375,
+        "lon": -116.3128656,
+        "countryIso2": "US",
+        "admin1": "California"
+      }
+    },
+    {
+      "id": "mmc9rzax-3yw96f",
+      "date": "2026-03-04",
+      "tag": "🌍",
+      "place": {
+        "name": "Ventura County, California, United States",
+        "lat": 34.4458248,
+        "lon": -119.0779359,
+        "countryIso2": "US",
+        "admin1": "California"
+      }
+    },
+    {
+      "id": "mmc9rfx7-3cea15",
+      "date": "2026-03-04",
+      "tag": "🌍",
+      "place": {
+        "name": "Channel Islands National Park, Santa Barbara County, California, United States",
+        "lat": 33.9663722,
+        "lon": -120.0954204,
+        "countryIso2": "US",
+        "admin1": "California"
+      }
+    },
+    {
+      "id": "ml4cixf6-bs7al1",
+      "date": "2026-02-01",
+      "tag": "🌍",
+      "place": {
+        "name": "Los Angeles, Los Angeles County, California, United States",
+        "lat": 34.0536909,
+        "lon": -118.242766,
+        "countryIso2": "US",
+        "admin1": "California"
+      }
+    },
+    {
+      "id": "ml4chhf7-brwvur",
+      "date": "2026-02-01",
+      "tag": "🌍",
+      "place": {
+        "name": "Las Vegas, Clark County, Nevada, United States",
+        "lat": 36.1674263,
+        "lon": -115.1484131,
+        "countryIso2": "US",
+        "admin1": "Nevada"
+      }
+    },
+    {
+      "id": "ml4cgjk2-gnkh3w",
+      "date": "2026-02-01",
+      "tag": "🌍",
+      "place": {
+        "name": "Death Valley, California, 92328, United States",
+        "lat": 36.4228722,
+        "lon": -116.913718,
+        "countryIso2": "US",
+        "admin1": "California"
+      }
+    },
+    {
+      "id": "mkqagqof-o2jcgy",
+      "date": "2026-01-23",
+      "tag": "🌍",
+      "place": {
+        "name": "Cleveland, Cuyahoga County, Ohio, United States",
+        "lat": 41.4996574,
+        "lon": -81.6936772,
+        "countryIso2": "US",
+        "admin1": "Ohio"
+      }
+    },
+    {
+      "id": "mkqafu62-rzxrgw",
+      "date": "2026-01-23",
+      "tag": "🌍",
+      "place": {
+        "name": "Toledo, Lucas County, Ohio, United States",
+        "lat": 41.6529143,
+        "lon": -83.5378173,
+        "countryIso2": "US",
+        "admin1": "Ohio"
+      }
+    },
+    {
+      "id": "mkmu048h-zax3xr",
+      "date": "2026-01-20",
+      "tag": "🌍",
+      "place": {
+        "name": "Zhijiang, Yichang, Hubei, 443200, China",
+        "lat": 30.4283835,
+        "lon": 111.7546868,
+        "countryIso2": "CN",
+        "admin1": "Hubei"
+      }
+    },
+    {
+      "id": "mk7m8kuz-rl7vjb",
+      "date": "2026-01-10",
+      "tag": "🌍",
+      "place": {
+        "name": "Dali Bai Autonomous Prefecture, Yunnan, China",
+        "lat": 25.6074778,
+        "lon": 100.2651597,
+        "countryIso2": "CN",
+        "admin1": "Yunnan"
+      }
+    },
+    {
+      "id": "mk7m7zzi-8p22ba",
+      "date": "2026-01-10",
+      "tag": "🌍",
+      "place": {
+        "name": "Yangjiang City, Guangdong, 529500, China",
+        "lat": 22.0958223,
+        "lon": 111.7831393,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mk7m7f5g-u2i1yo",
+      "date": "2026-01-10",
+      "tag": "🌍",
+      "place": {
+        "name": "Chenzhou, Hunan, China",
+        "lat": 25.7733598,
+        "lon": 113.0094337,
+        "countryIso2": "CN",
+        "admin1": "Hunan"
+      }
+    },
+    {
+      "id": "mk7m7058-xv7vmc",
+      "date": "2026-01-10",
+      "tag": "🌍",
+      "place": {
+        "name": "Zhangjiajie, Hunan, China",
+        "lat": 29.373828,
+        "lon": 110.530142,
+        "countryIso2": "CN",
+        "admin1": "Hunan"
+      }
+    },
+    {
+      "id": "mk7m5yot-1dazsi",
+      "date": "2026-01-10",
+      "tag": "🌍",
+      "place": {
+        "name": "Moridaga, Ergun City, Hulunbuir, Inner Mongolia, China",
+        "lat": 51.2657434,
+        "lon": 120.7715894,
+        "countryIso2": "CN",
+        "admin1": "Inner Mongolia"
+      }
+    },
+    {
+      "id": "mk6dax81-waaq9w",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Macau, China",
+        "lat": 22.1757605,
+        "lon": 113.5514142,
+        "countryIso2": "CN",
+        "admin1": "Macau"
+      }
+    },
+    {
+      "id": "mk67a6jg-vbbrya",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Fort Wayne, Allen County, Indiana, United States",
+        "lat": 41.0799898,
+        "lon": -85.1386015,
+        "countryIso2": "US",
+        "admin1": "Indiana"
+      }
+    },
+    {
+      "id": "mk679roy-yu6xlc",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Traverse City, Grand Traverse County, Michigan, United States",
+        "lat": 44.7606481,
+        "lon": -85.6165976,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mk679i9q-tfdx3q",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Grand Rapids, Kent County, Michigan, United States",
+        "lat": 42.9632425,
+        "lon": -85.6678639,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mk679avg-fu11n2",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Munising, Alger County, Michigan, 49862, United States",
+        "lat": 46.4100035,
+        "lon": -86.6494698,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mk678yxw-bulje0",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Louisville, Jefferson County, Kentucky, United States",
+        "lat": 38.2542376,
+        "lon": -85.759407,
+        "countryIso2": "US",
+        "admin1": "Kentucky"
+      }
+    },
+    {
+      "id": "mk678ct5-nexq78",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Chicago, South Chicago Township, Cook County, Illinois, United States",
+        "lat": 41.8755616,
+        "lon": -87.6244212,
+        "countryIso2": "US",
+        "admin1": "Illinois"
+      }
+    },
+    {
+      "id": "mk6781ob-7hrbs1",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Seattle, King County, Washington, United States",
+        "lat": 47.6038321,
+        "lon": -122.330062,
+        "countryIso2": "US",
+        "admin1": "Washington"
+      }
+    },
+    {
+      "id": "mk677sfs-8zm0c2",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Anchorage, Alaska, United States",
+        "lat": 61.2163129,
+        "lon": -149.894852,
+        "countryIso2": "US",
+        "admin1": "Alaska"
+      }
+    },
+    {
+      "id": "mk6775tq-9mxm85",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Fairbanks, Fairbanks North Star Borough, Alaska, United States",
+        "lat": 64.837845,
+        "lon": -147.716675,
+        "countryIso2": "US",
+        "admin1": "Alaska"
+      }
+    },
+    {
+      "id": "mk676w01-zznk4h",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "New Orleans, Orleans Parish, Louisiana, United States",
+        "lat": 29.9561422,
+        "lon": -90.0733934,
+        "countryIso2": "US",
+        "admin1": "Louisiana"
+      }
+    },
+    {
+      "id": "mk676kwu-4a8qx4",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Miami, Miami-Dade County, Florida, United States",
+        "lat": 25.7741566,
+        "lon": -80.1935973,
+        "countryIso2": "US",
+        "admin1": "Florida"
+      }
+    },
+    {
+      "id": "mk675jzi-y72nlr",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Key West, Monroe County, Florida, United States",
+        "lat": 24.5548262,
+        "lon": -81.8020722,
+        "countryIso2": "US",
+        "admin1": "Florida"
+      }
+    },
+    {
+      "id": "mk675e5a-6owfzy",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Atlanta, Fulton County, Georgia, United States",
+        "lat": 33.7544657,
+        "lon": -84.3898151,
+        "countryIso2": "US",
+        "admin1": "Georgia"
+      }
+    },
+    {
+      "id": "mk6746t9-tek23p",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "East Lansing, Ingham County, Michigan, United States",
+        "lat": 42.7320307,
+        "lon": -84.4721678,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mk673wgg-j5hy4d",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "New York, United States",
+        "lat": 40.7127281,
+        "lon": -74.0060152,
+        "countryIso2": "US",
+        "admin1": "New York"
+      }
+    },
+    {
+      "id": "mk673pz4-imgi14",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Boston, Suffolk County, Massachusetts, United States",
+        "lat": 42.3588336,
+        "lon": -71.0578303,
+        "countryIso2": "US",
+        "admin1": "Massachusetts"
+      }
+    },
+    {
+      "id": "mk6739uc-1zzo0o",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Kangding, Kardze, Sichuan, 626000, China",
+        "lat": 30.0002558,
+        "lon": 101.9545581,
+        "countryIso2": "CN",
+        "admin1": "Sichuan"
+      }
+    },
+    {
+      "id": "mk672wb8-50wjmw",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Jingzhou, Hubei, 434000, China",
+        "lat": 30.3375612,
+        "lon": 112.2337264,
+        "countryIso2": "CN",
+        "admin1": "Hubei"
+      }
+    },
+    {
+      "id": "mk672kj2-irdyjo",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Shiyan, Hubei, China",
+        "lat": 32.45269,
+        "lon": 110.560812,
+        "countryIso2": "CN",
+        "admin1": "Hubei"
+      }
+    },
+    {
+      "id": "mk672dc3-4x22a4",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Yichang, Hubei, China",
+        "lat": 30.6941332,
+        "lon": 111.2803512,
+        "countryIso2": "CN",
+        "admin1": "Hubei"
+      }
+    },
+    {
+      "id": "mk672a4i-ni61ev",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Jingmen, Hubei, China",
+        "lat": 31.0375248,
+        "lon": 112.1937979,
+        "countryIso2": "CN",
+        "admin1": "Hubei"
+      }
+    },
+    {
+      "id": "mk671oaf-klcgxe",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Yingde City, Qingyuan City, Guangdong, 513000, China",
+        "lat": 24.2079886,
+        "lon": 113.3962832,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mk671jfk-195bs4",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Qingyuan City, Guangdong, China",
+        "lat": 23.6832984,
+        "lon": 113.0505994,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mk671efs-e1cj9b",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Zhangzhou City, Fujian, China",
+        "lat": 24.2388257,
+        "lon": 117.4524304,
+        "countryIso2": "CN",
+        "admin1": "Fujian"
+      }
+    },
+    {
+      "id": "mk671al9-hhr8af",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Fuzhou City, Fujian, China",
+        "lat": 26.0774954,
+        "lon": 119.2918215,
+        "countryIso2": "CN",
+        "admin1": "Fujian"
+      }
+    },
+    {
+      "id": "mk67172l-t4akv2",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Xiamen, Fujian, China",
+        "lat": 24.5438732,
+        "lon": 118.0768065,
+        "countryIso2": "CN",
+        "admin1": "Fujian"
+      }
+    },
+    {
+      "id": "mk6710gn-3c7cwa",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Pingxiang, Jiangxi, 337000, China",
+        "lat": 27.5440835,
+        "lon": 113.9513109,
+        "countryIso2": "CN",
+        "admin1": "Jiangxi"
+      }
+    },
+    {
+      "id": "mk670nvi-z7pbf2",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Jinggangshan City, Ji'an City, Jiangxi, 343600, China",
+        "lat": 26.6467321,
+        "lon": 114.1543932,
+        "countryIso2": "CN",
+        "admin1": "Jiangxi"
+      }
+    },
+    {
+      "id": "mk670itu-ra4j6m",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Hangzhou City, Zhejiang, China",
+        "lat": 30.2489634,
+        "lon": 120.2052342,
+        "countryIso2": "CN",
+        "admin1": "Zhejiang"
+      }
+    },
+    {
+      "id": "mk670fd1-1mcijx",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Shanghai, China",
+        "lat": 31.2312707,
+        "lon": 121.4700152,
+        "countryIso2": "CN",
+        "admin1": "Shanghai"
+      }
+    },
+    {
+      "id": "mk670bvm-9an23n",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Nanjing City, Jiangsu, China",
+        "lat": 32.0438284,
+        "lon": 118.7788631,
+        "countryIso2": "CN",
+        "admin1": "Jiangsu"
+      }
+    },
+    {
+      "id": "mk6707bv-i5t2wl",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Anqing, Anhui, China",
+        "lat": 30.6592336,
+        "lon": 116.6302585,
+        "countryIso2": "CN",
+        "admin1": "Anhui"
+      }
+    },
+    {
+      "id": "mk6703ym-hcdz7n",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Huangshan, Anhui, China",
+        "lat": 29.7172627,
+        "lon": 118.3324811,
+        "countryIso2": "CN",
+        "admin1": "Anhui"
+      }
+    },
+    {
+      "id": "mk66zzns-2y6htv",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Wuhu, Anhui, China",
+        "lat": 31.1800568,
+        "lon": 118.2141777,
+        "countryIso2": "CN",
+        "admin1": "Anhui"
+      }
+    },
+    {
+      "id": "mk66zik6-d6bmjq",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Chuzhou, Anhui, China",
+        "lat": 32.3027377,
+        "lon": 118.3139455,
+        "countryIso2": "CN",
+        "admin1": "Anhui"
+      }
+    },
+    {
+      "id": "mk66zdek-w68iea",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Hefei, Anhui, China",
+        "lat": 31.8665676,
+        "lon": 117.281428,
+        "countryIso2": "CN",
+        "admin1": "Anhui"
+      }
+    },
+    {
+      "id": "mk66z5lv-s2p32h",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Macau, 519000, China",
+        "lat": 22.1899448,
+        "lon": 113.5380454,
+        "countryIso2": "CN",
+        "admin1": "Macau"
+      }
+    },
+    {
+      "id": "mk66y1wv-8i0hn9",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Lijiang City, Yunnan, China",
+        "lat": 26.8595868,
+        "lon": 100.2249797,
+        "countryIso2": "CN",
+        "admin1": "Yunnan"
+      }
+    },
+    {
+      "id": "mk66xkdo-sp5o26",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Chongqing, China",
+        "lat": 30.05518,
+        "lon": 107.8748712,
+        "countryIso2": "CN",
+        "admin1": "Chongqing"
+      }
+    },
+    {
+      "id": "mk66x8em-kxo75s",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Daocheng County, Kardze, Sichuan, 627700, China",
+        "lat": 28.8743067,
+        "lon": 100.2327419,
+        "countryIso2": "CN",
+        "admin1": "Sichuan"
+      }
+    },
+    {
+      "id": "mk66x01d-0bo28w",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Chengdu, Sichuan, China",
+        "lat": 30.659867,
+        "lon": 104.063315,
+        "countryIso2": "CN",
+        "admin1": "Sichuan"
+      }
+    },
+    {
+      "id": "mk66wv7t-qwpyb4",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Qinghaihu, Haiyan County, Haibei, Qinghai, China",
+        "lat": 36.8535525,
+        "lon": 100.8540383,
+        "countryIso2": "CN",
+        "admin1": "Qinghai"
+      }
+    },
+    {
+      "id": "mk66wrn8-jbvjtr",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Xining City, Qinghai, China",
+        "lat": 36.824463,
+        "lon": 101.440811,
+        "countryIso2": "CN",
+        "admin1": "Qinghai"
+      }
+    },
+    {
+      "id": "mk66wl4q-m60dav",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Lanzhou, Gansu, China",
+        "lat": 36.474436,
+        "lon": 103.733224,
+        "countryIso2": "CN",
+        "admin1": "Gansu"
+      }
+    },
+    {
+      "id": "mk66weyz-zqcwh1",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Zhongwei City, Ningxia, 755000, China",
+        "lat": 36.985074,
+        "lon": 105.496587,
+        "countryIso2": "CN",
+        "admin1": "Ningxia"
+      }
+    },
+    {
+      "id": "mk66wabb-dfa6h6",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Yinchuan City, Ningxia, China",
+        "lat": 38.4852037,
+        "lon": 106.2261926,
+        "countryIso2": "CN",
+        "admin1": "Ningxia"
+      }
+    },
+    {
+      "id": "mk66w4tb-52jicj",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Xi'an, Shaanxi, China",
+        "lat": 34.261004,
+        "lon": 108.9423363,
+        "countryIso2": "CN",
+        "admin1": "Shaanxi"
+      }
+    },
+    {
+      "id": "mk66vrcq-w7ozp0",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Genhe, Hulunbuir, Inner Mongolia, China",
+        "lat": 50.7811626,
+        "lon": 121.5251639,
+        "countryIso2": "CN",
+        "admin1": "Inner Mongolia"
+      }
+    },
+    {
+      "id": "mk66vk4d-giolfs",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Ergun City, Hulunbuir, Inner Mongolia, China",
+        "lat": 51.67179,
+        "lon": 120.781386,
+        "countryIso2": "CN",
+        "admin1": "Inner Mongolia"
+      }
+    },
+    {
+      "id": "mk66trab-enkht8",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Hailar District, Hulunbuir, Inner Mongolia, 021000, China",
+        "lat": 49.2321432,
+        "lon": 119.817227,
+        "countryIso2": "CN",
+        "admin1": "Inner Mongolia"
+      }
+    },
+    {
+      "id": "mk66i7aa-9n00n9",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Manzhouli, Hulunbuir, Inner Mongolia, China",
+        "lat": 49.5914042,
+        "lon": 117.4464324,
+        "countryIso2": "CN",
+        "admin1": "Inner Mongolia"
+      }
+    },
+    {
+      "id": "mk66i244-fyw30d",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Changsha, Hunan, China",
+        "lat": 28.1450774,
+        "lon": 113.2384362,
+        "countryIso2": "CN",
+        "admin1": "Hunan"
+      }
+    },
+    {
+      "id": "mk66hx8n-q3g419",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Wuhan, Hubei, China",
+        "lat": 30.5951051,
+        "lon": 114.2999353,
+        "countryIso2": "CN",
+        "admin1": "Hubei"
+      }
+    },
+    {
+      "id": "mk66hqq4-222h5u",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Hong Kong, China",
+        "lat": 22.319,
+        "lon": 114.169,
+        "countryIso2": "CN",
+        "admin1": "Hong Kong"
+      }
+    },
+    {
+      "id": "mk66houd-2b80qb",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Shenzhen, China",
+        "lat": 22.5455,
+        "lon": 114.068,
+        "countryIso2": "CN",
+        "admin1": "Guangdong"
+      }
+    },
+    {
+      "id": "mk66fm7g-y70frl",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Istanbul, Marmara Region, Turkey",
+        "lat": 41.0707456,
+        "lon": 29.0509414,
+        "countryIso2": "TR",
+        "admin1": null
+      }
+    },
+    {
+      "id": "mk66ey78-ivdvxv",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Detroit, Wayne County, Michigan, United States",
+        "lat": 42.3315509,
+        "lon": -83.0466403,
+        "countryIso2": "US",
+        "admin1": "Michigan"
+      }
+    },
+    {
+      "id": "mk66d9ri-yr7q5t",
+      "date": "2026-01-09",
+      "tag": "🌍",
+      "place": {
+        "name": "Beijing, China",
+        "lat": 39.904,
+        "lon": 116.407,
+        "countryIso2": "CN",
+        "admin1": "Beijing"
+      }
+    }
+  ]
+}

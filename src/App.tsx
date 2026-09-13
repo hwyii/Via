@@ -907,7 +907,7 @@ export default function App() {
       {/* Stats Card */}
       {!embedMode && (
       <div style={{
-        position: "absolute", top: 12, left: 12, width: 220, padding: 12, borderRadius: 16,
+        position: "absolute", top: 12, left: 12, width: 250, padding: 12, borderRadius: 16,
         background: UI.panelBackground,
         border: `1px solid ${UI.panelBorder}`,
         color: UI.panelText,
@@ -998,7 +998,7 @@ export default function App() {
             {/* Backup menu button */}
             <button 
               onClick={() => setDownloadMenuOpen(!downloadMenuOpen)}
-              style={{ flex: 1, minWidth: 0, padding: "5px 3px", fontSize: 10.5, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer" }}
+              style={{ flex: 1, minWidth: 0, padding: "5px 3px", fontSize: 10.5, whiteSpace: "nowrap", background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer" }}
             >
               ⬇️ Backup
             </button>
@@ -1049,7 +1049,7 @@ export default function App() {
             )}
 
             {/* Restore button */}
-            <label style={{ flex: 1, minWidth: 0, padding: "5px 3px", fontSize: 10.5, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer", textAlign: "center" }}>
+            <label style={{ flex: 1, minWidth: 0, padding: "5px 3px", fontSize: 10.5, whiteSpace: "nowrap", background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer", textAlign: "center" }}>
               ⬆️ Restore
               <input type="file" accept=".json" onChange={handleImport} style={{ display: "none" }} />
             </label>
@@ -1063,6 +1063,7 @@ export default function App() {
                 minWidth: 0,
                 padding: "5px 3px",
                 fontSize: 10.5,
+                whiteSpace: "nowrap",
                 background: UI.controlBackground,
                 color: UI.controlText,
                 border: `1px solid ${UI.controlBorder}`,

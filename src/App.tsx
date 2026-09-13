@@ -3,7 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { geocode } from "./geocode";
-import { loadTrips, saveTrips, loadTags, saveTags, exportData, importData, loadParkVisits, saveParkVisits, loadParkMapVisibility, saveParkMapVisibility, loadPublishedData } from "./storage";
+import { loadTrips, saveTrips, loadTags, saveTags, exportData, importData, loadParkVisits, saveParkVisits, loadParkMapVisibility, saveParkMapVisibility, loadPublishedData, publishData } from "./storage";
 import { Pill } from "./components/UI/Pill";
 import { 
   uniq, 
@@ -146,6 +146,8 @@ export default function App() {
   const [mapReady, setMapReady] = useState(false);
   // const [exportScope, setExportScope] = useState<"all" | "current">("all");
   const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishStatus, setPublishStatus] = useState<string | null>(null);
 
   // Tag state
   const [tags, setTagsState] = useState<string[]>(() => publishedMode ? [] : loadTags());
@@ -582,6 +584,30 @@ export default function App() {
     e.target.value = ""; 
   }
 
+  async function handlePublish() {
+    let secret = sessionStorage.getItem("via-publish-secret") ?? "";
+    if (!secret) {
+      secret = window.prompt("Enter the Via publish password:") ?? "";
+    }
+    if (!secret) return;
+
+    setPublishing(true);
+    setPublishStatus(null);
+    try {
+      await publishData(trips, tags, secret);
+      sessionStorage.setItem("via-publish-secret", secret);
+      setPublishStatus(`Published ${trips.length} footprints to the homepage.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message === "Incorrect publish password.") {
+        sessionStorage.removeItem("via-publish-secret");
+      }
+      setPublishStatus(message);
+    } finally {
+      setPublishing(false);
+    }
+  }
+
   const filteredTrips = useMemo(() => {
     let result = trips.filter((t) => t.tag === tag);
     if (yearFilter !== "all") result = result.filter(t => t.date.startsWith(yearFilter));
@@ -967,7 +993,7 @@ export default function App() {
         )}
 
         {/* Backup tools */}
-        <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${UI.divider}`, display: "flex", gap: 10, position: "relative" }}>
+        <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${UI.divider}`, display: "flex", flexWrap: "wrap", gap: 10, position: "relative" }}>
             
             {/* Backup menu button */}
             <button 
@@ -1027,6 +1053,31 @@ export default function App() {
               ⬆️ Restore
               <input type="file" accept=".json" onChange={handleImport} style={{ display: "none" }} />
             </label>
+
+            <button
+              type="button"
+              onClick={handlePublish}
+              disabled={publishing}
+              style={{
+                flex: "1 0 100%",
+                padding: "6px",
+                fontSize: 12,
+                background: UI.controlBackground,
+                color: UI.controlText,
+                border: `1px solid ${UI.controlBorder}`,
+                borderRadius: 6,
+                cursor: publishing ? "wait" : "pointer",
+                opacity: publishing ? 0.65 : 1,
+              }}
+            >
+              {publishing ? "Publishing…" : "☁️ Publish to Homepage"}
+            </button>
+
+            {publishStatus && (
+              <div style={{ flex: "1 0 100%", color: UI.secondaryText, fontSize: 11, lineHeight: 1.35 }}>
+                {publishStatus}
+              </div>
+            )}
          </div>
         </>}
       </div>

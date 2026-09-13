@@ -1,6 +1,6 @@
 # 🌍 Via: Travel Footprints
 
-> A privacy-first, interactive travel tracker. No backend, no database—your data stays in your browser.
+> A privacy-first, interactive travel tracker. Your working data stays in your browser unless you explicitly publish it.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![React](https://img.shields.io/badge/React-19-61dafb.svg)
@@ -20,7 +20,7 @@
 
 ## ✨ Key Features
 
-* **🔒 Privacy First**: All data is stored locally in your browser (`localStorage`). No data is ever sent to a server. Your memories belong to you.
+* **🔒 Privacy First**: Working data is stored locally in your browser (`localStorage`). Data is only sent when you explicitly use the optional publishing feature.
 * **🌏 Smart Views**: Automatically switches between **World**, **China**, **USA**, and **U.S. National Parks** views.
 * **🚆 Transit Tracking**: Distinguish between places you visited and places you only passed through.
 * **📊 Travel Stats**: See your visited country count and year-based travel summary.
@@ -83,6 +83,17 @@ Root Directory: /
 
 #### 4. Updates
 Whenever you push changes to your GitHub repository, Vercel or EdgeOne Pages can automatically redeploy your site.
+
+#### 5. Optional homepage publishing
+
+The Vercel deployment can publish the current browser data to `public/footprints.json`, which is what the public/embed view loads. Add these environment variables in the Vercel project settings:
+
+```txt
+VIA_GITHUB_TOKEN=<fine-grained GitHub token with Contents: Read and write for this repository>
+VIA_PUBLISH_SECRET=<a strong password used by the Publish to Homepage button>
+```
+
+Redeploy after adding the variables. The GitHub token is only read by the server-side Vercel Function and is never sent to the browser. Static-only hosts such as EdgeOne Pages do not provide this publishing endpoint.
 
 ### Option 3: Local Development
 

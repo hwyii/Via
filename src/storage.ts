@@ -135,6 +135,24 @@ export function exportData(trips: Trip[], tags: string[]) {
   URL.revokeObjectURL(url);
 }
 
+export async function publishData(trips: Trip[], tags: string[], secret: string) {
+  const validTags = tags.filter(Boolean);
+  const data: TravelBackup = {
+    version: 2,
+    tags: validTags,
+    trips: trips.filter((trip) => validTags.includes(trip.tag)),
+  };
+  const response = await fetch("/api/publish", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ secret, data }),
+  });
+  const result = await response.json().catch(() => null) as { error?: string } | null;
+  if (!response.ok) {
+    throw new Error(result?.error || `Publishing failed (${response.status}).`);
+  }
+}
+
 // Parse an imported backup file.
 export function importData(file: File): Promise<{ trips: Trip[]; tags: string[] | null }> {
   return new Promise((resolve, reject) => {

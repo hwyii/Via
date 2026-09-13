@@ -89,6 +89,57 @@ export default function App() {
   const publishedMode = embedMode || query.get("public") === "1";
   const [colorMode, setColorMode] = useState<ColorMode>(initialColorMode);
   const THEME = colorMode === "dark" ? DARK_THEME : LIGHT_THEME;
+  const UI = colorMode === "dark" ? {
+    panelBackground: "rgba(15,23,42,0.88)",
+    panelBorder: "rgba(255,255,255,0.1)",
+    panelText: "#f8fafc",
+    secondaryText: "#94a3b8",
+    mutedText: "#64748b",
+    faintText: "#3a4a5e",
+    controlBackground: "rgba(255,255,255,0.1)",
+    controlBorder: "rgba(255,255,255,0.18)",
+    controlText: "#fff",
+    inactiveControlBackground: "rgba(10,16,28,0.55)",
+    inactiveControlText: "rgba(255,255,255,0.75)",
+    activeControlBackground: "rgba(255,255,255,0.92)",
+    activeControlText: "#0b1220",
+    menuBackground: "#1e293b",
+    divider: "rgba(255,255,255,0.1)",
+    hoverBackground: "rgba(255,255,255,0.1)",
+    progressTrack: "rgba(255,255,255,0.08)",
+    toggleOffBackground: "rgba(51,65,85,0.9)",
+    toggleOffBorder: "rgba(148,163,184,0.22)",
+    toggleOffKnob: "#94a3b8",
+    emptyCheckBorder: "#2a3a55",
+    checkText: "#fff",
+    cardShadow: "0 8px 32px rgba(0,0,0,0.18)",
+    menuShadow: "0 10px 25px rgba(0,0,0,0.5)",
+  } : {
+    panelBackground: "rgba(255,255,255,0.94)",
+    panelBorder: "rgba(178,134,16,0.48)",
+    panelText: "#493a11",
+    secondaryText: "#77652e",
+    mutedText: "#8c7a45",
+    faintText: "#a99b73",
+    controlBackground: "rgba(255,255,255,0.78)",
+    controlBorder: "rgba(178,134,16,0.34)",
+    controlText: "#6f570f",
+    inactiveControlBackground: "rgba(255,255,255,0.78)",
+    inactiveControlText: "#77652e",
+    activeControlBackground: "#d2ad35",
+    activeControlText: "#fff",
+    menuBackground: "rgba(255,255,255,0.98)",
+    divider: "rgba(178,134,16,0.22)",
+    hoverBackground: "rgba(210,173,53,0.14)",
+    progressTrack: "rgba(178,134,16,0.14)",
+    toggleOffBackground: "#eee8d8",
+    toggleOffBorder: "#d5c9aa",
+    toggleOffKnob: "#9b8e6a",
+    emptyCheckBorder: "#c9bd9c",
+    checkText: "#6f570f",
+    cardShadow: "0 10px 30px rgba(89,72,24,0.16), 0 1px 4px rgba(89,72,24,0.1)",
+    menuShadow: "0 10px 25px rgba(89,72,24,0.18)",
+  };
   const mapElRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const parkMarkersRef = useRef<maplibregl.Marker[]>([]);
@@ -831,10 +882,10 @@ export default function App() {
       {!embedMode && (
       <div style={{
         position: "absolute", top: 14, left: 14, padding: 16, borderRadius: 20,
-        background: colorMode === "dark" ? "rgba(15,23,42,0.6)" : "rgba(255,255,255,0.82)",
-        border: `1px solid ${colorMode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(184,143,25,0.24)"}`,
-        color: colorMode === "dark" ? "#f8fafc" : "#444",
-        backdropFilter: "blur(12px)", minWidth: 240, boxShadow: "0 8px 32px rgba(0,0,0,0.18)"
+        background: UI.panelBackground,
+        border: `1px solid ${UI.panelBorder}`,
+        color: UI.panelText,
+        backdropFilter: "blur(12px)", minWidth: 240, boxShadow: UI.cardShadow
       }}>
         <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: "0.02em" }}>Travel Footprints</div>
         <div style={{ marginTop: 4, fontSize: 13, opacity: 0.8 }}>
@@ -885,12 +936,12 @@ export default function App() {
               onChange={e => setNewTagVal(e.target.value)}
               onBlur={confirmAddTag}
               onKeyDown={e => e.key === "Enter" && confirmAddTag()}
-              style={{ width: 60, padding: "6px 10px", borderRadius: 99, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(0,0,0,0.5)", color: "#fff", outline: "none", fontSize: 12 }}
+              style={{ width: 60, padding: "6px 10px", borderRadius: 99, border: `1px solid ${UI.controlBorder}`, background: UI.controlBackground, color: UI.controlText, outline: "none", fontSize: 12 }}
             />
           ) : (
             <button onClick={() => setIsAddingTag(true)} style={{
-               padding: "4px 10px", borderRadius: 99, border: "1px dashed rgba(255,255,255,0.3)",
-               background: "transparent", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: 14
+               padding: "4px 10px", borderRadius: 99, border: `1px dashed ${UI.controlBorder}`,
+               background: "transparent", color: UI.controlText, cursor: "pointer", fontSize: 14
             }}>+</button>
           )}
         </div>
@@ -903,9 +954,9 @@ export default function App() {
                 onClick={() => setYearFilter(y)}
                 style={{
                   padding: "3px 9px", borderRadius: 99, fontSize: 11, cursor: "pointer",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  background: yearFilter === y ? "rgba(255,255,255,0.92)" : "rgba(10,16,28,0.55)",
-                  color: yearFilter === y ? "#0b1220" : "rgba(255,255,255,0.75)",
+                  border: `1px solid ${UI.controlBorder}`,
+                  background: yearFilter === y ? UI.activeControlBackground : UI.inactiveControlBackground,
+                  color: yearFilter === y ? UI.activeControlText : UI.inactiveControlText,
                   fontWeight: yearFilter === y ? 700 : 400,
                 }}
               >
@@ -916,12 +967,12 @@ export default function App() {
         )}
 
         {/* Backup tools */}
-        <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", gap: 10, position: "relative" }}>
+        <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${UI.divider}`, display: "flex", gap: 10, position: "relative" }}>
             
             {/* Backup menu button */}
             <button 
               onClick={() => setDownloadMenuOpen(!downloadMenuOpen)}
-              style={{ flex: 1, padding: "6px", fontSize: 12, background: "rgba(255,255,255,0.1)", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}
+              style={{ flex: 1, padding: "6px", fontSize: 12, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer" }}
             >
               ⬇️ Backup
             </button>
@@ -934,10 +985,10 @@ export default function App() {
                 left: 0,
                 marginTop: 8,
                 width: 140,
-                background: "#1e293b", // Dark background
-                border: "1px solid rgba(255,255,255,0.1)",
+                background: UI.menuBackground,
+                border: `1px solid ${UI.panelBorder}`,
                 borderRadius: 8,
-                boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+                boxShadow: UI.menuShadow,
                 zIndex: 10,
                 overflow: "hidden",
                 display: "flex", 
@@ -949,8 +1000,8 @@ export default function App() {
                     exportData(trips, tags); // Export visible tags only
                     setDownloadMenuOpen(false); // Close menu
                   }}
-                  style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: "#e2e8f0", fontSize: 12, cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+                  style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: UI.panelText, fontSize: 12, cursor: "pointer", borderBottom: `1px solid ${UI.divider}` }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = UI.hoverBackground}
                   onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                 >
                   Download All
@@ -962,8 +1013,8 @@ export default function App() {
                     exportData(trips.filter(t => t.tag === tag), [tag]); // Export current tag
                     setDownloadMenuOpen(false);
                   }}
-                  style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: "#3b82f6", fontSize: 12, cursor: "pointer" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+                  style={{ padding: "10px 12px", textAlign: "left", background: "transparent", border: "none", color: colorMode === "dark" ? "#3b82f6" : THEME.hiOutline, fontSize: 12, cursor: "pointer" }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = UI.hoverBackground}
                   onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                 >
                   Download "{tag}"
@@ -972,7 +1023,7 @@ export default function App() {
             )}
 
             {/* Restore button */}
-            <label style={{ flex: 1, padding: "6px", fontSize: 12, background: "rgba(255,255,255,0.1)", color: "#fff", borderRadius: 6, cursor: "pointer", textAlign: "center" }}>
+            <label style={{ flex: 1, padding: "6px", fontSize: 12, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer", textAlign: "center" }}>
               ⬆️ Restore
               <input type="file" accept=".json" onChange={handleImport} style={{ display: "none" }} />
             </label>
@@ -1077,15 +1128,15 @@ export default function App() {
             overflowY: parkSidebarOpen ? "auto" : "hidden",
             opacity: parkSidebarOpen ? 1 : 0,
             transition: "width 0.3s ease, opacity 0.2s ease",
-            background: "rgba(15,23,42,0.88)",
+            background: UI.panelBackground,
             backdropFilter: "blur(14px)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            border: `1px solid ${UI.panelBorder}`,
             borderRight: "none",
             borderRadius: "12px 0 0 12px",
             scrollbarWidth: "thin",
-            scrollbarColor: "rgba(255,255,255,0.15) transparent",
+            scrollbarColor: `${UI.controlBorder} transparent`,
           }}>
-            <div style={{ width: 240, padding: "14px 16px", color: "#f8fafc" }}>
+            <div style={{ width: 240, padding: "14px 16px", color: UI.panelText }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>National Parks</div>
                 <label
@@ -1094,7 +1145,7 @@ export default function App() {
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
-                    color: showParksOnMap ? "#c8f7ff" : "#64748b",
+                    color: showParksOnMap ? (colorMode === "dark" ? "#c8f7ff" : "#8a6501") : UI.mutedText,
                     fontSize: 10,
                     fontWeight: 700,
                     cursor: "pointer",
@@ -1113,8 +1164,8 @@ export default function App() {
                     width: 28,
                     height: 16,
                     borderRadius: 999,
-                    background: showParksOnMap ? THEME.hiFill : "rgba(51,65,85,0.9)",
-                    border: `1px solid ${showParksOnMap ? THEME.hiOutline : "rgba(148,163,184,0.22)"}`,
+                    background: showParksOnMap ? THEME.hiFill : UI.toggleOffBackground,
+                    border: `1px solid ${showParksOnMap ? THEME.hiOutline : UI.toggleOffBorder}`,
                     position: "relative",
                     flexShrink: 0,
                     transition: "background 0.2s ease, border-color 0.2s ease",
@@ -1126,18 +1177,18 @@ export default function App() {
                       width: 10,
                       height: 10,
                       borderRadius: "50%",
-                      background: showParksOnMap ? THEME.pointColor : "#94a3b8",
-                      boxShadow: showParksOnMap ? "0 0 8px rgba(41,223,242,0.7)" : "none",
+                      background: showParksOnMap ? THEME.pointColor : UI.toggleOffKnob,
+                      boxShadow: showParksOnMap ? (colorMode === "dark" ? "0 0 8px rgba(41,223,242,0.7)" : "0 0 7px rgba(197,143,0,0.34)") : "none",
                       transition: "left 0.2s ease, background 0.2s ease",
                     }} />
                   </span>
                 </label>
               </div>
-              <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8 }}>
+              <div style={{ fontSize: 11, color: UI.mutedText, marginBottom: 8 }}>
                 {visitedParks.size} / {NATIONAL_PARKS.length} visited
               </div>
               {/* Progress bar */}
-              <div style={{ height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 2, marginBottom: 14, overflow: "hidden" }}>
+              <div style={{ height: 3, background: UI.progressTrack, borderRadius: 2, marginBottom: 14, overflow: "hidden" }}>
                 <div style={{
                   height: "100%",
                   width: `${(visitedParks.size / NATIONAL_PARKS.length) * 100}%`,
@@ -1154,7 +1205,7 @@ export default function App() {
                   <div key={state} style={{ marginBottom: 10 }}>
                     <div style={{
                       fontSize: 10, fontWeight: 700,
-                      color: stateVisited > 0 ? "#94a3b8" : "#334155",
+                      color: stateVisited > 0 ? UI.secondaryText : UI.faintText,
                       letterSpacing: "0.08em", textTransform: "uppercase",
                       marginBottom: 4, display: "flex", justifyContent: "space-between",
                     }}>
@@ -1175,15 +1226,15 @@ export default function App() {
                             width: "100%", padding: "3px 0",
                             background: "transparent", border: "none", cursor: "pointer",
                             textAlign: "left", fontSize: 11.5,
-                            color: visited ? "#e2e8f0" : "#3a4a5e",
+                            color: visited ? UI.panelText : UI.faintText,
                           }}
                         >
                           <span style={{
                             width: 14, height: 14, borderRadius: "50%", flexShrink: 0,
                             display: "flex", alignItems: "center", justifyContent: "center",
                             background: visited ? THEME.hiFill : "transparent",
-                            border: `1.5px solid ${visited ? THEME.hiOutline : "#2a3a55"}`,
-                            fontSize: 9, color: "#fff", fontWeight: 700,
+                            border: `1.5px solid ${visited ? THEME.hiOutline : UI.emptyCheckBorder}`,
+                            fontSize: 9, color: UI.checkText, fontWeight: 700,
                           }}>
                             {visited ? "✓" : ""}
                           </span>
@@ -1206,11 +1257,11 @@ export default function App() {
               flexShrink: 0,
               width: 30,
               padding: "14px 0",
-              background: "rgba(15,23,42,0.8)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderLeft: parkSidebarOpen ? "none" : "1px solid rgba(255,255,255,0.1)",
+              background: UI.panelBackground,
+              border: `1px solid ${UI.panelBorder}`,
+              borderLeft: parkSidebarOpen ? "none" : `1px solid ${UI.panelBorder}`,
               borderRadius: parkSidebarOpen ? "0 12px 12px 0" : "12px",
-              color: "#f8fafc",
+              color: UI.panelText,
               cursor: "pointer",
               backdropFilter: "blur(12px)",
               display: "flex",
@@ -1223,16 +1274,16 @@ export default function App() {
             <span style={{ fontSize: 14 }}>🏕</span>
             <span style={{
               writingMode: "vertical-rl", textOrientation: "mixed",
-              fontSize: 9, letterSpacing: "0.1em", color: "#64748b",
+              fontSize: 9, letterSpacing: "0.1em", color: UI.mutedText,
               fontWeight: 700, textTransform: "uppercase",
             }}>Parks</span>
             <span style={{
               fontSize: 10, fontWeight: 700,
-              color: visitedParks.size > 0 ? THEME.pointColor : "#475569",
+              color: visitedParks.size > 0 ? THEME.pointColor : UI.faintText,
             }}>
               {visitedParks.size}/{NATIONAL_PARKS.length}
             </span>
-            <span style={{ fontSize: 10, color: "#475569" }}>
+            <span style={{ fontSize: 10, color: UI.mutedText }}>
               {parkSidebarOpen ? "▶" : "◀"}
             </span>
           </button>

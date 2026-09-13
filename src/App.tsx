@@ -869,7 +869,7 @@ export default function App() {
           style={{
             position: "absolute",
             top: 14,
-            right: 14,
+            right: 52,
             zIndex: 10,
             width: 32,
             height: 32,
@@ -907,21 +907,21 @@ export default function App() {
       {/* Stats Card */}
       {!embedMode && (
       <div style={{
-        position: "absolute", top: 14, left: 14, padding: 16, borderRadius: 20,
+        position: "absolute", top: 12, left: 12, width: 220, padding: 12, borderRadius: 16,
         background: UI.panelBackground,
         border: `1px solid ${UI.panelBorder}`,
         color: UI.panelText,
-        backdropFilter: "blur(12px)", minWidth: 240, boxShadow: UI.cardShadow
+        backdropFilter: "blur(12px)", boxSizing: "border-box", boxShadow: UI.cardShadow
       }}>
-        <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: "0.02em" }}>Travel Footprints</div>
-        <div style={{ marginTop: 4, fontSize: 13, opacity: 0.8 }}>
+        <div style={{ fontWeight: 800, fontSize: 14, letterSpacing: "0.02em" }}>Travel Footprints</div>
+        <div style={{ marginTop: 3, fontSize: 11.5, opacity: 0.8 }}>
           {publishedLoading ? "Loading published map…" : primaryStatsLabel}
         </div>
         {mapError && <div style={{ color: "red", fontSize: 12 }}>{mapError}</div>}
 
         {!publishedMode && <>
         {/* Tag List */}
-        <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 6 }}>
+        <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 4 }}>
           {tags.map(t => {
             const isEditing = editingTag === t;
             const isActive = tag === t;
@@ -973,13 +973,13 @@ export default function App() {
         </div>
         {/* Year filter */}
         {availableYears.length > 0 && (
-          <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center" }}>
+          <div style={{ marginTop: 7, display: "flex", flexWrap: "wrap", gap: 3, alignItems: "center" }}>
             {["all", ...availableYears].map(y => (
               <button
                 key={y}
                 onClick={() => setYearFilter(y)}
                 style={{
-                  padding: "3px 9px", borderRadius: 99, fontSize: 11, cursor: "pointer",
+                  padding: "2px 7px", borderRadius: 99, fontSize: 10.5, cursor: "pointer",
                   border: `1px solid ${UI.controlBorder}`,
                   background: yearFilter === y ? UI.activeControlBackground : UI.inactiveControlBackground,
                   color: yearFilter === y ? UI.activeControlText : UI.inactiveControlText,
@@ -993,12 +993,12 @@ export default function App() {
         )}
 
         {/* Backup tools */}
-        <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${UI.divider}`, display: "flex", flexWrap: "wrap", gap: 10, position: "relative" }}>
+        <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${UI.divider}`, display: "flex", flexWrap: "wrap", gap: 5, position: "relative" }}>
             
             {/* Backup menu button */}
             <button 
               onClick={() => setDownloadMenuOpen(!downloadMenuOpen)}
-              style={{ flex: 1, padding: "6px", fontSize: 12, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer" }}
+              style={{ flex: 1, minWidth: 0, padding: "5px 3px", fontSize: 10.5, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer" }}
             >
               ⬇️ Backup
             </button>
@@ -1049,7 +1049,7 @@ export default function App() {
             )}
 
             {/* Restore button */}
-            <label style={{ flex: 1, padding: "6px", fontSize: 12, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer", textAlign: "center" }}>
+            <label style={{ flex: 1, minWidth: 0, padding: "5px 3px", fontSize: 10.5, background: UI.controlBackground, color: UI.controlText, border: `1px solid ${UI.controlBorder}`, borderRadius: 6, cursor: "pointer", textAlign: "center" }}>
               ⬆️ Restore
               <input type="file" accept=".json" onChange={handleImport} style={{ display: "none" }} />
             </label>
@@ -1059,9 +1059,10 @@ export default function App() {
               onClick={handlePublish}
               disabled={publishing}
               style={{
-                flex: "1 0 100%",
-                padding: "6px",
-                fontSize: 12,
+                flex: 1,
+                minWidth: 0,
+                padding: "5px 3px",
+                fontSize: 10.5,
                 background: UI.controlBackground,
                 color: UI.controlText,
                 border: `1px solid ${UI.controlBorder}`,
@@ -1070,7 +1071,7 @@ export default function App() {
                 opacity: publishing ? 0.65 : 1,
               }}
             >
-              {publishing ? "Publishing…" : "☁️ Publish to Homepage"}
+              {publishing ? "Publishing…" : "☁️ Publish"}
             </button>
 
             {publishStatus && (

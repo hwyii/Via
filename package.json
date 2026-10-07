@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:website": "tsc -b && vite build --base ./ --outDir ../hwyii.github.io/assets/travel-map --emptyOutDir"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

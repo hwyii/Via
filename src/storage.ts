@@ -3,7 +3,7 @@ import type { Trip } from "./types";
 const KEY = "travel-footprints:trips";
 const TAGS_KEY = "travel-footprints:tags";
 const PARK_VISITS_KEY = "travel-footprints:park-visits";
-const PARK_MAP_VISIBILITY_KEY = "travel-footprints:park-map-visible";
+const PARK_MAP_VISIBILITY_KEY = "travel-footprints:park-map-visible:v2";
 
 export type TravelBackup = {
   version: 2;
@@ -78,7 +78,7 @@ export async function loadPublishedData(): Promise<TravelBackup> {
     if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
     return parsePublishedData(await response.json());
   } catch (githubError) {
-    const fallback = await fetch("/footprints.json", { cache: "no-store" });
+    const fallback = await fetch(`${import.meta.env.BASE_URL}footprints.json`, { cache: "no-store" });
     if (!fallback.ok) {
       const detail = githubError instanceof Error ? githubError.message : String(githubError);
       throw new Error(`Could not load published footprints (${detail}; fallback ${fallback.status})`);
@@ -104,9 +104,10 @@ export function saveParkVisits(visits: Record<string, string[]>) {
 
 export function loadParkMapVisibility(): boolean {
   try {
-    return localStorage.getItem(PARK_MAP_VISIBILITY_KEY) === "true";
+    const saved = localStorage.getItem(PARK_MAP_VISIBILITY_KEY);
+    return saved === null ? true : saved === "true";
   } catch {
-    return false;
+    return true;
   }
 }
 

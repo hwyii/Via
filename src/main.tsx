@@ -7,7 +7,7 @@ import { Analytics } from '@vercel/analytics/react';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-    <Analytics />
+    {new URLSearchParams(window.location.search).get("embed") !== "1" && <Analytics />}
   </StrictMode>,
 )
 

@@ -108,3 +108,11 @@ npm install
 
 # 3. Start the development server
 npm run dev
+
+## Academic homepage embed
+
+Run `npm run build:website` to rebuild the static map in the sibling
+`hwyii.github.io/assets/travel-map` directory. The homepage loads this bundle
+with `?embed=1` and sends `{ type: "via-theme", theme: "dark", palette: "espresso" }`
+to apply the warm Espresso colors. Send `theme: "light"` to restore the light map.
+Published travel data still loads from the Via repository, with a bundled fallback.

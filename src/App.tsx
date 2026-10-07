@@ -5,6 +5,8 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { geocode } from "./geocode";
 import { loadTrips, saveTrips, loadTags, saveTags, exportData, importData, loadParkVisits, saveParkVisits, loadParkMapVisibility, saveParkMapVisibility, loadPublishedData, publishData } from "./storage";
 import { Pill } from "./components/UI/Pill";
+import { NationalParkBadge } from "./components/NationalParkBadge";
+import { getParkBadgeUrl } from "./lib/parkBadge";
 import { 
   uniq, 
   uid, 
@@ -13,7 +15,7 @@ import {
   getFlagEmoji 
 } from "./lib/utils";
 import { CN_EN_TO_ZH } from "./constants/geoMaps";
-import { NATIONAL_PARKS, PARKS_BY_STATE, PARK_COORDS } from "./constants/nationalParks";
+import { NATIONAL_PARKS, PARK_COORDS } from "./constants/nationalParks";
 import type { TagId, Trip, Candidate, VisitType } from "./types";
 import { HOT_CITIES } from "./constants/hotCities";
 
@@ -56,6 +58,19 @@ const DARK_THEME = {
   transitPointOpacity: 0.48
 };
 
+const ESPRESSO_THEME = {
+  ...DARK_THEME,
+  pageBackground: "#1c1208",
+  baseFill: "#2e1f0e",
+  baseLine: "#4a3318",
+  hiFill: "#805321",
+  hiOutline: "#d4943a",
+  pointColor: "#f1bc65",
+  transitFill: "#a89080",
+  transitOutline: "#c4ab92",
+  transitPointColor: "#c4ab92",
+};
+
 const LIGHT_THEME = {
   pageBackground: "#fbfaf7",
   baseFill: "#f1ede4",
@@ -88,7 +103,9 @@ export default function App() {
   const embedMode = query.get("embed") === "1";
   const publishedMode = embedMode || query.get("public") === "1";
   const [colorMode, setColorMode] = useState<ColorMode>(initialColorMode);
-  const THEME = colorMode === "dark" ? DARK_THEME : LIGHT_THEME;
+  const [embedPalette, setEmbedPalette] = useState(() => query.get("palette"));
+  const espresso = embedMode && colorMode === "dark" && embedPalette === "espresso";
+  const THEME = espresso ? ESPRESSO_THEME : colorMode === "dark" ? DARK_THEME : LIGHT_THEME;
   const UI = colorMode === "dark" ? {
     panelBackground: "rgba(15,23,42,0.88)",
     panelBorder: "rgba(255,255,255,0.1)",
@@ -188,7 +205,8 @@ export default function App() {
   useEffect(() => {
     if (!embedMode) return;
     const receiveTheme = (event: MessageEvent) => {
-      if (event.data?.type !== "via-theme") return;
+      if (event.source !== window.parent || event.data?.type !== "via-theme") return;
+      setEmbedPalette(event.data.palette === "espresso" ? "espresso" : null);
       if (event.data.theme === "light" || event.data.theme === "dark") {
         setColorMode(event.data.theme);
       }
@@ -345,9 +363,9 @@ export default function App() {
       map.on("load", () => {
         map.resize();
 
-        map.addSource("countries", { type: "geojson", data: "/geo/countries.geojson" });
-        map.addSource("cn-provinces", { type: "geojson", data: "/geo/cn-provinces.geojson" });
-        map.addSource("us-states", { type: "geojson", data: "/geo/us-states.geojson" });
+        map.addSource("countries", { type: "geojson", data: `${import.meta.env.BASE_URL}geo/countries.geojson` });
+        map.addSource("cn-provinces", { type: "geojson", data: `${import.meta.env.BASE_URL}geo/cn-provinces.geojson` });
+        map.addSource("us-states", { type: "geojson", data: `${import.meta.env.BASE_URL}geo/us-states.geojson` });
 
         // Base layers
         const baseFill = THEME.baseFill;
@@ -449,7 +467,7 @@ export default function App() {
     map.setPaintProperty("trip-points-layer", "circle-stroke-width", THEME.pointStrokeWidth);
     map.setPaintProperty("trip-points-transit-layer", "circle-color", THEME.transitPointColor);
     map.setPaintProperty("trip-points-transit-layer", "circle-opacity", THEME.transitPointOpacity);
-  }, [colorMode, mapReady]);
+  }, [colorMode, embedPalette, mapReady]);
 
   // Search
   useEffect(() => {
@@ -619,12 +637,14 @@ export default function App() {
 
   function togglePark(parkName: string) {
     const current = parkVisits[tag] ?? [];
-    const next = current.includes(parkName)
+    const wasVisited = current.includes(parkName);
+    const next = wasVisited
       ? current.filter(p => p !== parkName)
       : [...current, parkName];
     const updated = { ...parkVisits, [tag]: next };
     setParkVisits(updated);
     saveParkVisits(updated);
+    if (!wasVisited) setShowParksOnMap(true);
   }
 
   // Update highlights.
@@ -750,24 +770,13 @@ export default function App() {
       el.type = "button";
       el.title = park.name;
       el.setAttribute("aria-label", park.name);
-      el.textContent = park.icon;
-      Object.assign(el.style, {
-        width: "24px",
-        height: "24px",
-        borderRadius: "50%",
-        border: `1px solid ${THEME.hiOutline}`,
-        background: "rgba(15,23,42,0.82)",
-        boxShadow: `0 0 0 2px rgba(41,223,242,0.18), 0 4px 12px rgba(0,0,0,0.35)`,
-        color: "#fff",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "14px",
-        lineHeight: "1",
-        padding: "0",
-        pointerEvents: "auto",
-      });
+      el.className = "park-map-marker";
+      const markerImage = document.createElement("img");
+      markerImage.src = getParkBadgeUrl(park.name);
+      markerImage.alt = "";
+      const markerLabel = document.createElement("span");
+      markerLabel.textContent = park.name;
+      el.append(markerImage, markerLabel);
 
       el.addEventListener("click", () => {
         map.easeTo({ center: coords, zoom: Math.max(map.getZoom(), 5), duration: 600 });
@@ -857,7 +866,7 @@ export default function App() {
   }, [view, mapReady, tag]);
 
   return (
-    <div className={`via-app theme-${colorMode}${embedMode ? " embed-mode" : ""}`} style={{ position: "relative", width: "100vw", height: "100vh", background: THEME.pageBackground, overflow: "hidden" }}>
+    <div className={`via-app theme-${colorMode}${embedMode ? " embed-mode" : ""}${espresso ? " palette-espresso" : ""}`} style={{ position: "relative", width: "100vw", height: "100vh", background: THEME.pageBackground, overflow: "hidden" }}>
       <div ref={mapElRef} style={{ position: "absolute", inset: 0 }} />
 
       {!embedMode && (
@@ -893,7 +902,7 @@ export default function App() {
           position: "absolute",
           top: 8,
           left: 8,
-          color: colorMode === "dark" ? "rgba(248,250,252,0.92)" : "#6f570f",
+          color: espresso ? "#d9c5a8" : colorMode === "dark" ? "rgba(248,250,252,0.92)" : "#6f570f",
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: "0.01em",
@@ -937,7 +946,7 @@ export default function App() {
                       style={{ width: 60, padding: "4px 8px", borderRadius: 99, border: "none", outline: "none", fontSize: 12 }}
                    />
                  ) : (
-                  <Pill theme={colorMode} active={isActive} onClick={() => setTag(t)}>
+                  <Pill theme={espresso ? "espresso" : colorMode} active={isActive} onClick={() => setTag(t)}>
                     <span onDoubleClick={() => startEditTag(t)} title="Double click to rename">{t}</span>
                     {tags.length > 1 && (
                       <span 
@@ -1096,7 +1105,7 @@ export default function App() {
         justifyContent: "center", alignItems: "start",
         borderRadius: flagListExpanded ? 14 : 999,
         background: stats.codes.length > 0
-          ? (colorMode === "dark" ? "rgba(15,23,42,0.42)" : "rgba(248,250,253,0.88)")
+          ? (espresso ? "rgba(37,26,12,0.85)" : colorMode === "dark" ? "rgba(15,23,42,0.42)" : "rgba(248,250,253,0.88)")
           : "transparent",
         backdropFilter: stats.codes.length > 0 ? "blur(10px)" : "none",
         border: stats.codes.length > 0
@@ -1148,9 +1157,9 @@ export default function App() {
 
       {/* View Switch */}
       <div style={{ position: "absolute", left: embedMode ? 8 : 14, bottom: embedMode ? 12 : 20, display: "flex", gap: embedMode ? 4 : 8 }}>
-        <Pill theme={colorMode} compact={embedMode} active={view === "world"} onClick={() => setView("world")}>World</Pill>
-        <Pill theme={colorMode} compact={embedMode} active={view === "cn"} onClick={() => setView("cn")}>China</Pill>
-        <Pill theme={colorMode} compact={embedMode} active={view === "us"} onClick={() => setView("us")}>USA</Pill>
+        <Pill theme={espresso ? "espresso" : colorMode} compact={embedMode} active={view === "world"} onClick={() => setView("world")}>World</Pill>
+        <Pill theme={espresso ? "espresso" : colorMode} compact={embedMode} active={view === "cn"} onClick={() => setView("cn")}>China</Pill>
+        <Pill theme={espresso ? "espresso" : colorMode} compact={embedMode} active={view === "us"} onClick={() => setView("us")}>USA</Pill>
       </div>
 
       {/* Add Button */}
@@ -1163,183 +1172,159 @@ export default function App() {
         }}
       >＋</button>}
 
-      {/* National Parks Sidebar */}
+      {/* National Parks badge gallery */}
       {!publishedMode && view === "us" && (
-        <div style={{
-          position: "absolute",
-          top: 80,
-          right: 0,
-          display: "flex",
-          alignItems: "flex-start",
-          zIndex: 5,
-        }}>
-          {/* Sliding panel */}
-          <div style={{
-            width: parkSidebarOpen ? 240 : 0,
-            maxHeight: "calc(100vh - 150px)",
-            overflowX: "hidden",
-            overflowY: parkSidebarOpen ? "auto" : "hidden",
-            opacity: parkSidebarOpen ? 1 : 0,
-            transition: "width 0.3s ease, opacity 0.2s ease",
-            background: UI.panelBackground,
-            backdropFilter: "blur(14px)",
-            border: `1px solid ${UI.panelBorder}`,
-            borderRight: "none",
-            borderRadius: "12px 0 0 12px",
-            scrollbarWidth: "thin",
-            scrollbarColor: `${UI.controlBorder} transparent`,
-          }}>
-            <div style={{ width: 240, padding: "14px 16px", color: UI.panelText }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 4 }}>
-                <div style={{ fontWeight: 700, fontSize: 13 }}>National Parks</div>
-                <label
-                  title="Show visited parks on map"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    color: showParksOnMap ? (colorMode === "dark" ? "#c8f7ff" : "#8a6501") : UI.mutedText,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    userSelect: "none",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <span>Show on map</span>
-                  <input
-                    type="checkbox"
-                    checked={showParksOnMap}
-                    onChange={(e) => setShowParksOnMap(e.target.checked)}
-                    style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
-                  />
-                  <span style={{
-                    width: 28,
-                    height: 16,
-                    borderRadius: 999,
-                    background: showParksOnMap ? THEME.hiFill : UI.toggleOffBackground,
-                    border: `1px solid ${showParksOnMap ? THEME.hiOutline : UI.toggleOffBorder}`,
-                    position: "relative",
-                    flexShrink: 0,
-                    transition: "background 0.2s ease, border-color 0.2s ease",
-                  }}>
-                    <span style={{
-                      position: "absolute",
-                      top: 2,
-                      left: showParksOnMap ? 14 : 2,
-                      width: 10,
-                      height: 10,
-                      borderRadius: "50%",
-                      background: showParksOnMap ? THEME.pointColor : UI.toggleOffKnob,
-                      boxShadow: showParksOnMap ? (colorMode === "dark" ? "0 0 8px rgba(41,223,242,0.7)" : "0 0 7px rgba(197,143,0,0.34)") : "none",
-                      transition: "left 0.2s ease, background 0.2s ease",
-                    }} />
-                  </span>
-                </label>
-              </div>
-              <div style={{ fontSize: 11, color: UI.mutedText, marginBottom: 8 }}>
-                {visitedParks.size} / {NATIONAL_PARKS.length} visited
-              </div>
-              {/* Progress bar */}
-              <div style={{ height: 3, background: UI.progressTrack, borderRadius: 2, marginBottom: 14, overflow: "hidden" }}>
-                <div style={{
-                  height: "100%",
-                  width: `${(visitedParks.size / NATIONAL_PARKS.length) * 100}%`,
-                  background: `linear-gradient(to right, ${THEME.hiFill}, ${THEME.pointColor})`,
-                  borderRadius: 2,
-                  transition: "width 0.5s ease",
-                }} />
-              </div>
-              {/* Parks grouped by state */}
-              {Object.keys(PARKS_BY_STATE).sort().map(state => {
-                const parks = PARKS_BY_STATE[state];
-                const stateVisited = parks.filter(p => visitedParks.has(p.name)).length;
-                return (
-                  <div key={state} style={{ marginBottom: 10 }}>
-                    <div style={{
-                      fontSize: 10, fontWeight: 700,
-                      color: stateVisited > 0 ? UI.secondaryText : UI.faintText,
-                      letterSpacing: "0.08em", textTransform: "uppercase",
-                      marginBottom: 4, display: "flex", justifyContent: "space-between",
-                    }}>
-                      <span>{state}</span>
-                      {stateVisited > 0 && (
-                        <span style={{ color: THEME.pointColor }}>{stateVisited}/{parks.length}</span>
-                      )}
+        <div className="park-gallery-shell">
+          {parkSidebarOpen && (
+            <section
+              className="park-gallery-panel"
+              role="dialog"
+              aria-label="U.S. National Parks collection"
+              style={{
+                background: UI.panelBackground,
+                border: `1px solid ${UI.panelBorder}`,
+                color: UI.panelText,
+                boxShadow: UI.menuShadow,
+              }}
+            >
+              <div style={{ padding: "17px 20px 13px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+                  <div style={{ minWidth: 0, textAlign: "left" }}>
+                    <div style={{ fontSize: 16, fontWeight: 850, letterSpacing: "0.01em" }}>National Parks</div>
+                    <div style={{ marginTop: 3, fontSize: 11, color: UI.mutedText }}>
+                      {visitedParks.size} of {NATIONAL_PARKS.length} badges collected · click a badge to update
                     </div>
-                    {parks.map(park => {
-                      const visited = visitedParks.has(park.name);
-                      return (
-                        <button
-                          key={park.name}
-                          onClick={() => togglePark(park.name)}
-                          title={visited ? "Mark as not visited" : "Mark as visited"}
-                          style={{
-                            display: "flex", alignItems: "center", gap: 8,
-                            width: "100%", padding: "3px 0",
-                            background: "transparent", border: "none", cursor: "pointer",
-                            textAlign: "left", fontSize: 11.5,
-                            color: visited ? UI.panelText : UI.faintText,
-                          }}
-                        >
-                          <span style={{
-                            width: 14, height: 14, borderRadius: "50%", flexShrink: 0,
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            background: visited ? THEME.hiFill : "transparent",
-                            border: `1.5px solid ${visited ? THEME.hiOutline : UI.emptyCheckBorder}`,
-                            fontSize: 9, color: UI.checkText, fontWeight: 700,
-                          }}>
-                            {visited ? "✓" : ""}
-                          </span>
-                          <span style={{ fontSize: 12 }}>{park.icon}</span>
-                          {park.name}
-                        </button>
-                      );
-                    })}
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <label
+                      title="Show visited parks on map"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 7,
+                        color: showParksOnMap ? (colorMode === "dark" ? "#c8f7ff" : "#8a6501") : UI.mutedText,
+                        fontSize: 10,
+                        fontWeight: 750,
+                        cursor: "pointer",
+                        userSelect: "none",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <span>Map pins</span>
+                      <input
+                        type="checkbox"
+                        checked={showParksOnMap}
+                        onChange={(event) => setShowParksOnMap(event.target.checked)}
+                        style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+                      />
+                      <span style={{
+                        width: 32,
+                        height: 18,
+                        borderRadius: 999,
+                        background: showParksOnMap ? THEME.hiFill : UI.toggleOffBackground,
+                        border: `1px solid ${showParksOnMap ? THEME.hiOutline : UI.toggleOffBorder}`,
+                        position: "relative",
+                        flexShrink: 0,
+                        transition: "background 0.2s ease, border-color 0.2s ease",
+                      }}>
+                        <span style={{
+                          position: "absolute",
+                          top: 2,
+                          left: showParksOnMap ? 16 : 2,
+                          width: 12,
+                          height: 12,
+                          borderRadius: "50%",
+                          background: showParksOnMap ? THEME.pointColor : UI.toggleOffKnob,
+                          boxShadow: showParksOnMap ? `0 0 8px ${THEME.pointColor}` : "none",
+                          transition: "left 0.2s ease, background 0.2s ease",
+                        }} />
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setParkSidebarOpen(false)}
+                      aria-label="Close national parks collection"
+                      style={{
+                        width: 28,
+                        height: 28,
+                        padding: 0,
+                        border: `1px solid ${UI.controlBorder}`,
+                        borderRadius: "50%",
+                        background: UI.controlBackground,
+                        color: UI.mutedText,
+                        cursor: "pointer",
+                        fontSize: 16,
+                      }}
+                    >×</button>
+                  </div>
+                </div>
+                <div style={{ height: 4, marginTop: 13, overflow: "hidden", borderRadius: 99, background: UI.progressTrack }}>
+                  <div style={{
+                    width: `${(visitedParks.size / NATIONAL_PARKS.length) * 100}%`,
+                    height: "100%",
+                    borderRadius: 99,
+                    background: `linear-gradient(90deg, ${THEME.hiFill}, ${THEME.pointColor})`,
+                    transition: "width 0.35s ease",
+                  }} />
+                </div>
+              </div>
 
-          {/* Toggle tab */}
-          <button
-            onClick={() => setParkSidebarOpen(p => !p)}
-            title={parkSidebarOpen ? "Close parks panel" : "National Parks"}
-            style={{
-              flexShrink: 0,
-              width: 30,
-              padding: "14px 0",
-              background: UI.panelBackground,
-              border: `1px solid ${UI.panelBorder}`,
-              borderLeft: parkSidebarOpen ? "none" : `1px solid ${UI.panelBorder}`,
-              borderRadius: parkSidebarOpen ? "0 12px 12px 0" : "12px",
-              color: UI.panelText,
-              cursor: "pointer",
-              backdropFilter: "blur(12px)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 6,
-              transition: "border-radius 0.3s ease",
-            }}
-          >
-            <span style={{ fontSize: 14 }}>🏕</span>
-            <span style={{
-              writingMode: "vertical-rl", textOrientation: "mixed",
-              fontSize: 9, letterSpacing: "0.1em", color: UI.mutedText,
-              fontWeight: 700, textTransform: "uppercase",
-            }}>Parks</span>
-            <span style={{
-              fontSize: 10, fontWeight: 700,
-              color: visitedParks.size > 0 ? THEME.pointColor : UI.faintText,
-            }}>
-              {visitedParks.size}/{NATIONAL_PARKS.length}
-            </span>
-            <span style={{ fontSize: 10, color: UI.mutedText }}>
-              {parkSidebarOpen ? "▶" : "◀"}
-            </span>
-          </button>
+              <div className="park-gallery-scroll" style={{ scrollbarColor: `${UI.controlBorder} transparent` }}>
+                <div className="park-badge-grid">
+                  {NATIONAL_PARKS.map((park) => {
+                    const visited = visitedParks.has(park.name);
+                    return (
+                      <button
+                        key={park.name}
+                        type="button"
+                        className="park-badge-button"
+                        onClick={() => togglePark(park.name)}
+                        aria-pressed={visited}
+                        title={`${park.name} · ${park.state} · ${visited ? "Mark as not visited" : "Mark as visited"}`}
+                        style={{
+                          color: visited ? UI.panelText : UI.faintText,
+                          background: visited ? UI.hoverBackground : "transparent",
+                          borderColor: visited ? UI.controlBorder : "transparent",
+                          boxShadow: visited && colorMode === "dark" ? "inset 0 1px rgba(255,255,255,0.04)" : "none",
+                        }}
+                      >
+                        <NationalParkBadge park={park} visited={visited} />
+                        <span className="park-badge-name">{park.name}</span>
+                        <span className="park-badge-state" style={{ color: visited ? UI.secondaryText : UI.faintText }}>{park.state}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {!parkSidebarOpen && (
+            <button
+              type="button"
+              className="park-gallery-toggle"
+              onClick={() => setParkSidebarOpen(true)}
+              title="Open National Parks collection"
+              aria-label={`Open National Parks collection, ${visitedParks.size} of ${NATIONAL_PARKS.length} visited`}
+              style={{
+                width: 62,
+                padding: "8px 6px 9px",
+                border: `1px solid ${UI.panelBorder}`,
+                borderRadius: 18,
+                background: UI.panelBackground,
+                color: UI.panelText,
+                boxShadow: UI.cardShadow,
+                backdropFilter: "blur(14px)",
+                cursor: "pointer",
+              }}
+            >
+              <NationalParkBadge park={NATIONAL_PARKS[0]} compact />
+              <span style={{ display: "block", marginTop: 2, fontSize: 9, fontWeight: 850, letterSpacing: "0.08em", textTransform: "uppercase" }}>Parks</span>
+              <span style={{ display: "block", marginTop: 2, color: visitedParks.size ? THEME.pointColor : UI.mutedText, fontSize: 10, fontWeight: 800 }}>
+                {visitedParks.size}/{NATIONAL_PARKS.length}
+              </span>
+            </button>
+          )}
         </div>
       )}
 

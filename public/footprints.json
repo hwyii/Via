@@ -5,6 +5,19 @@
   ],
   "trips": [
     {
+      "id": "mvpg63ne-dvzozx",
+      "date": "2026-10-26",
+      "tag": "🌍",
+      "visitType": "visited",
+      "place": {
+        "name": "Gatlinburg, Sevier County, East Tennessee, Tennessee, United States",
+        "lat": 35.714259,
+        "lon": -83.5101638,
+        "countryIso2": "US",
+        "admin1": "Tennessee"
+      }
+    },
+    {
       "id": "mt6i6oao-is3rx0",
       "date": "2026-08-24",
       "tag": "🌍",

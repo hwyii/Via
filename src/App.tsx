@@ -71,6 +71,24 @@ const ESPRESSO_THEME = {
   transitPointColor: "#c4ab92",
 };
 
+// Matches the academic homepage's light "Matcha" palette.
+const SAGE_THEME = {
+  pageBackground: "#f1f5f2",
+  baseFill: "#dfe7e2",
+  baseLine: "#c3d0c8",
+  hiFill: "#a9cbb6",
+  hiOutline: "#5f9476",
+  hiOpacity: 0.92,
+  pointColor: "#3d8a63",
+  pointStrokeColor: "#22533c",
+  pointStrokeWidth: 1.5,
+  transitFill: "#7d8a82",
+  transitOutline: "#64716a",
+  transitOpacity: 0.7,
+  transitPointColor: "#66736c",
+  transitPointOpacity: 0.8
+};
+
 const LIGHT_THEME = {
   pageBackground: "#fbfaf7",
   baseFill: "#f1ede4",
@@ -105,7 +123,9 @@ export default function App() {
   const [colorMode, setColorMode] = useState<ColorMode>(initialColorMode);
   const [embedPalette, setEmbedPalette] = useState(() => query.get("palette"));
   const espresso = embedMode && colorMode === "dark" && embedPalette === "espresso";
-  const THEME = espresso ? ESPRESSO_THEME : colorMode === "dark" ? DARK_THEME : LIGHT_THEME;
+  const sage = embedMode && colorMode === "light" && embedPalette === "matcha";
+  const THEME = espresso ? ESPRESSO_THEME : sage ? SAGE_THEME : colorMode === "dark" ? DARK_THEME : LIGHT_THEME;
+  const pillTheme = espresso ? "espresso" : sage ? "sage" : colorMode;
   const UI = colorMode === "dark" ? {
     panelBackground: "rgba(15,23,42,0.88)",
     panelBorder: "rgba(255,255,255,0.1)",
@@ -206,7 +226,7 @@ export default function App() {
     if (!embedMode) return;
     const receiveTheme = (event: MessageEvent) => {
       if (event.source !== window.parent || event.data?.type !== "via-theme") return;
-      setEmbedPalette(event.data.palette === "espresso" ? "espresso" : null);
+      setEmbedPalette(event.data.palette === "espresso" || event.data.palette === "matcha" ? event.data.palette : null);
       if (event.data.theme === "light" || event.data.theme === "dark") {
         setColorMode(event.data.theme);
       }
@@ -866,7 +886,7 @@ export default function App() {
   }, [view, mapReady, tag]);
 
   return (
-    <div className={`via-app theme-${colorMode}${embedMode ? " embed-mode" : ""}${espresso ? " palette-espresso" : ""}`} style={{ position: "relative", width: "100vw", height: "100vh", background: THEME.pageBackground, overflow: "hidden" }}>
+    <div className={`via-app theme-${colorMode}${embedMode ? " embed-mode" : ""}${espresso ? " palette-espresso" : ""}${sage ? " palette-sage" : ""}`} style={{ position: "relative", width: "100vw", height: "100vh", background: THEME.pageBackground, overflow: "hidden" }}>
       <div ref={mapElRef} style={{ position: "absolute", inset: 0 }} />
 
       {!embedMode && (
@@ -902,7 +922,7 @@ export default function App() {
           position: "absolute",
           top: 8,
           left: 8,
-          color: espresso ? "#d9c5a8" : colorMode === "dark" ? "rgba(248,250,252,0.92)" : "#6f570f",
+          color: espresso ? "#d9c5a8" : sage ? "#22533c" : colorMode === "dark" ? "rgba(248,250,252,0.92)" : "#6f570f",
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: "0.01em",
@@ -946,7 +966,7 @@ export default function App() {
                       style={{ width: 60, padding: "4px 8px", borderRadius: 99, border: "none", outline: "none", fontSize: 12 }}
                    />
                  ) : (
-                  <Pill theme={espresso ? "espresso" : colorMode} active={isActive} onClick={() => setTag(t)}>
+                  <Pill theme={pillTheme} active={isActive} onClick={() => setTag(t)}>
                     <span onDoubleClick={() => startEditTag(t)} title="Double click to rename">{t}</span>
                     {tags.length > 1 && (
                       <span 
@@ -1105,11 +1125,11 @@ export default function App() {
         justifyContent: "center", alignItems: "start",
         borderRadius: flagListExpanded ? 14 : 999,
         background: stats.codes.length > 0
-          ? (espresso ? "rgba(37,26,12,0.85)" : colorMode === "dark" ? "rgba(15,23,42,0.42)" : "rgba(248,250,253,0.88)")
+          ? (espresso ? "rgba(37,26,12,0.85)" : sage ? "rgba(246,249,247,0.9)" : colorMode === "dark" ? "rgba(15,23,42,0.42)" : "rgba(248,250,253,0.88)")
           : "transparent",
         backdropFilter: stats.codes.length > 0 ? "blur(10px)" : "none",
         border: stats.codes.length > 0
-          ? (colorMode === "dark" ? "none" : "1px solid rgba(184,143,25,0.22)")
+          ? (colorMode === "dark" ? "none" : sage ? "1px solid rgba(47,106,78,0.2)" : "1px solid rgba(184,143,25,0.22)")
           : "none",
         pointerEvents: "auto"
       }}>
@@ -1136,9 +1156,9 @@ export default function App() {
                width: 24,
                height: 24,
                borderRadius: 999,
-               border: `1px solid ${colorMode === "dark" ? "rgba(255,255,255,0.22)" : "rgba(184,143,25,0.32)"}`,
-               background: colorMode === "dark" ? "rgba(15,23,42,0.78)" : "rgba(255,255,255,0.94)",
-               color: colorMode === "dark" ? "#e2e8f0" : "#9a7110",
+               border: `1px solid ${colorMode === "dark" ? "rgba(255,255,255,0.22)" : sage ? "rgba(47,106,78,0.3)" : "rgba(184,143,25,0.32)"}`,
+               background: colorMode === "dark" ? "rgba(15,23,42,0.78)" : sage ? "rgba(246,249,247,0.94)" : "rgba(255,255,255,0.94)",
+               color: colorMode === "dark" ? "#e2e8f0" : sage ? "#2f6a4e" : "#9a7110",
                cursor: "pointer",
                display: "flex",
                alignItems: "center",
@@ -1157,9 +1177,9 @@ export default function App() {
 
       {/* View Switch */}
       <div style={{ position: "absolute", left: embedMode ? 8 : 14, bottom: embedMode ? 12 : 20, display: "flex", gap: embedMode ? 4 : 8 }}>
-        <Pill theme={espresso ? "espresso" : colorMode} compact={embedMode} active={view === "world"} onClick={() => setView("world")}>World</Pill>
-        <Pill theme={espresso ? "espresso" : colorMode} compact={embedMode} active={view === "cn"} onClick={() => setView("cn")}>China</Pill>
-        <Pill theme={espresso ? "espresso" : colorMode} compact={embedMode} active={view === "us"} onClick={() => setView("us")}>USA</Pill>
+        <Pill theme={pillTheme} compact={embedMode} active={view === "world"} onClick={() => setView("world")}>World</Pill>
+        <Pill theme={pillTheme} compact={embedMode} active={view === "cn"} onClick={() => setView("cn")}>China</Pill>
+        <Pill theme={pillTheme} compact={embedMode} active={view === "us"} onClick={() => setView("us")}>USA</Pill>
       </div>
 
       {/* Add Button */}

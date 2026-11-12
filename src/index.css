@@ -15,11 +15,11 @@ body {
 .palette-espresso .maplibregl-ctrl-icon { filter: invert(1); }
 .palette-espresso .maplibregl-ctrl-group button:hover { background-color: #3a2810; }
 
-/* Sage controls for the academic homepage's embedded Matcha map. */
-.palette-sage .maplibregl-ctrl-group { background: #f6f9f7; border: 1px solid #cdd8d0; }
-.palette-sage .maplibregl-ctrl-group:not(:empty) { box-shadow: none; }
-.palette-sage .maplibregl-ctrl-group button + button { border-top-color: #cdd8d0; }
-.palette-sage .maplibregl-ctrl-group button:hover { background-color: #e2ebe5; }
+/* Ink controls for the academic homepage's embedded Ink map. */
+.palette-ink .maplibregl-ctrl-group { background: #f6f8fc; border: 1px solid #dbe2ee; }
+.palette-ink .maplibregl-ctrl-group:not(:empty) { box-shadow: none; }
+.palette-ink .maplibregl-ctrl-group button + button { border-top-color: #dbe2ee; }
+.palette-ink .maplibregl-ctrl-group button:hover { background-color: #e6ebf4; }
 
 .park-gallery-shell {
   position: absolute;
